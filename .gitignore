@@ -34,3 +34,6 @@
 #visual studio
 */.vs/
 **/Debug/
+
+#xcode
+.DS_Store
