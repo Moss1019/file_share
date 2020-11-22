@@ -22,7 +22,7 @@ UdpSocket::UdpSocket(const SockAddress &address)
 
 UdpSocket::~UdpSocket()
 {
-	close();
+    closeSocket();
 }
 
 bool UdpSocket::inError() const
@@ -67,13 +67,12 @@ int UdpSocket::receiveFrom(char *data, unsigned maxSize)
 	return bytesReceived;
 }
 
-bool UdpSocket::close()
+bool UdpSocket::closeSocket()
 {
 	if (m_inError)
 	{
 		return m_inError;
 	}
-	shutdown(m_sock, SD_BOTH);
 #ifdef _WIN32
 	shutdown(m_sock, SD_BOTH);
 	closesocket(m_sock);

@@ -8,6 +8,7 @@ typedef int sock_addr_size;
 #else
 
 typedef unsigned sock_addr_size;
+#include <unistd.h>
 
 #endif
 
@@ -37,7 +38,7 @@ public:
 
 	int receiveFrom(char *data, unsigned maxSize);
 
-	bool close();
+	bool closeSocket();
 
 	UdpSocket(const UdpSocket &other) = delete;
 

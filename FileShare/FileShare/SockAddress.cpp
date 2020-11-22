@@ -21,7 +21,7 @@ SockAddress::SockAddress(const std::string &ipAddress, const std::string &identi
     memset(&m_address, 0, sizeof(sockaddr));
     addressAsSockAddrIn()->sin_family = PF_INET;
     addressAsSockAddrIn()->sin_port = htons(port);
-    inet_pton(AF_INET, ipAddress, &addressAsSockAddrIn()->sin_addr);
+    inet_pton(AF_INET, ipAddress.c_str(), &addressAsSockAddrIn()->sin_addr);
 }
 #endif
 
