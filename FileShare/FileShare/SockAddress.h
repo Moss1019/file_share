@@ -34,6 +34,8 @@ public:
 
 	const std::string &identifier() const;
 
+	void setIdentifier(const std::string &identifier);
+
 	std::string getInetAddress();
 
 	SockAddress(const SockAddress &other) = delete;

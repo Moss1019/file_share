@@ -46,6 +46,11 @@ const std::string &SockAddress::identifier() const
     return m_identifier;
 }
 
+void SockAddress::setIdentifier(const std::string &identifier)
+{
+    m_identifier = identifier;
+}
+
 #ifdef _WIN32
 std::string SockAddress::getInetAddress()
 {

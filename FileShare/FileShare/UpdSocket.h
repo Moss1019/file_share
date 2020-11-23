@@ -36,6 +36,8 @@ public:
 
 	int sendTo(const char *data, unsigned dataSize, const SockAddress &destination);
 
+	int receiveFrom(char *data, unsigned maxSize, SockAddress *remote);
+
 	int receiveFrom(char *data, unsigned maxSize);
 
 	bool closeSocket();
