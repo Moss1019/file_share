@@ -26,7 +26,7 @@ public:
 	SockAddress(const std::string &ipAddress, const std::string &identifier, unsigned short port);
 #endif
 
-	SockAddress(const sockaddr &address, const std::string &identifier);
+	SockAddress(const sockaddr &address);
 
 	const sockaddr *address() const;
 

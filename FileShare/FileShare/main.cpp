@@ -13,11 +13,12 @@
 
 #include <iostream>
 
-#include "SockAddress.h"
 #include "UpdSocket.h"
+#include "SockAddress.h"
 #include "CommandInfo.h"
-#include "OutputMemoryStream.h"
+#include "AddressServer.h"
 #include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
 
 
 int main(int argc, const char * argv[])
@@ -29,7 +30,7 @@ int main(int argc, const char * argv[])
     bool isRunning = true;
 
 #ifdef _WIN32
-    SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
+    /*SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
     UdpSocket socket(hostAddr);
     SockAddress remoteAddr(L"192.168.1.176", "Mac", 8081);
     while(isRunning)
@@ -50,7 +51,9 @@ int main(int argc, const char * argv[])
                 isRunning = false;
             }
         }
-    }
+    }*/
+    AddressServer server(L"192.168.1.100");
+    server.startServer();
 #else
     SockAddress hostAddr("192.168.1.176", "Mac", 8081);
     UdpSocket socket(hostAddr);
@@ -78,7 +81,6 @@ int main(int argc, const char * argv[])
     
 
 #endif
-    socket.closeSocket();
 
 #ifdef _WIN32
     WSACleanup();

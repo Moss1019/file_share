@@ -50,7 +50,7 @@ int UdpSocket::sendTo(const char *data, unsigned dataSize, const SockAddress &de
 	return bytesSent;
 }
 
-int UdpSocket::receiveFrom(char *data, unsigned maxSize, SockAddress *remote)
+int UdpSocket::receiveFrom(char *data, unsigned maxSize, SockAddress **remote)
 {
 	if (m_inError)
 	{
@@ -59,8 +59,7 @@ int UdpSocket::receiveFrom(char *data, unsigned maxSize, SockAddress *remote)
 	sockaddr remoteHost;
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
 	int bytesReceived = recvfrom(m_sock, data, maxSize, 0, &remoteHost, &remoteHostSize);
-	SockAddress sa(remoteHost, "no_id");
-	memcpy(remote, &sa, sizeof(SockAddress));
+	*remote = new SockAddress(remoteHost);
 	if (bytesReceived < 0)
 	{
 		m_inError = true;
@@ -78,7 +77,7 @@ int UdpSocket::receiveFrom(char *data, unsigned maxSize)
 	sockaddr remoteHost;
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
 	int bytesReceived = recvfrom(m_sock, data, maxSize, 0, &remoteHost, &remoteHostSize);
-	SockAddress sa(remoteHost, "no_id");
+	SockAddress sa(remoteHost);
 	if (bytesReceived < 0)
 	{
 		m_inError = true;
