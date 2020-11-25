@@ -16,6 +16,8 @@
 #include "SockAddress.h"
 #include "UpdSocket.h"
 #include "CommandInfo.h"
+#include "OutputMemoryStream.h"
+#include "InputMemoryStream.h"
 
 
 int main(int argc, const char * argv[])
@@ -24,24 +26,39 @@ int main(int argc, const char * argv[])
     WSAData wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 #endif
-    int value = 90;
-    auto f = [value](int signal) { std::cout << value << "Hello lambda\n";  };
+    bool isRunning = true;
 
-    SockAddress hostAddr("192.168.1.176", "Host", 8081);
+#ifdef _WIN32
+    SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
     UdpSocket socket(hostAddr);
-    bool isRunning = false;
-
-    SockAddress remoteAddr("192.168.1.100", "Remote", 8081);
-
+    SockAddress remoteAddr(L"192.168.1.176", "Mac", 8081);
+    while(isRunning)
+    {
+        char buffer[1024];
+        unsigned received = socket.receiveFrom(buffer, 1024);
+        InputMemoryStream stream(buffer, received);
+        CommandInfo info;
+        info.read(stream);
+        switch(info.type)
+        {
+            case CMD_DISCONNETED:
+            {
+                isRunning = false;
+            }
+            case CMD_CONNECTED:
+            {
+                std::cout << std::string(static_cast<const char *>(info.data)) << std::endl;
+            }
+        }
+    }
+#else
+    SockAddress hostAddr("192.168.1.176", "Mac", 8081);
+    UdpSocket socket(hostAddr);
+    SockAddress remoteAddr("192.168.1.100", "Windows", 8081);
     std::string input;
     while (isRunning)
     {
         std::cin >> input;
-        if (input == "-quit")
-        {
-            isRunning = false;
-            break;
-        }
         CommandInfo info;
         char inputData[1024];
         strcpy(inputData, input.c_str());
@@ -49,13 +66,18 @@ int main(int argc, const char * argv[])
         info.data = reinterpret_cast<void *>(inputData);
         info.dataLength = strlen(inputData);
         info.type = CMD_CONNECTED;
-        socket.sendTo((const char *)&info, input.length() + 8, remoteAddr);
+        if (input == "-quit")
+        {
+            isRunning = false;
+            info.type = CMD_DISCONNETED;
+        }
+        OutputMemoryStream stream;
+        info.write(stream);
+        socket.sendTo(stream.getBufferPtr(), stream.getLength(), remoteAddr);
     }
     
-    char buffer[1024];
-    int received = socket.receiveFrom(buffer, 1024);
-    std::cout << received << std::endl;
-    CommandInfo info;
+
+#endif
     socket.closeSocket();
 
 #ifdef _WIN32
