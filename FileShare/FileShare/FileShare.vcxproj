@@ -148,6 +148,7 @@
     <ClCompile Include="UpdSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddressRecord.h" />
     <ClInclude Include="AddressServer.h" />
     <ClInclude Include="CommandInfo.h" />
     <ClInclude Include="InputMemoryStream.h" />

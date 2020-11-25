@@ -1,9 +1,15 @@
+#ifdef _WIN32
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "AddressServer.h"
 
 #include <string>
+#include <cstring>
 #include <iostream>
 
 #include "CommandInfo.h"
+#include "AddressRecord.h"
 #include "InputMemoryStream.h"
 
 #ifdef _WIN32
@@ -19,7 +25,7 @@ AddressServer::AddressServer(PCWSTR ipAddress)
 
 AddressServer::~AddressServer()
 {
-	for (int i = 0; i < m_addresses.size(); ++i)
+	for (unsigned i = 0; i < m_addresses.size(); ++i)
 	{
 		delete m_addresses[i];
 	}
@@ -62,11 +68,25 @@ void AddressServer::startServer()
 					break;
 				}
 			}
-			m_addresses.erase(iterator);
+			if(iterator != m_addresses.end())
+			{
+				m_addresses.erase(iterator);
+			}
 			break;
 		}
 		case CMD_GET_ADDRESSES:
 		{
+			OutputMemoryStream stream;
+			stream.write(m_addresses.size());
+			for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
+			{
+				AddressRecord rec;
+				strcpy(rec.identifier, (*i)->identifier().c_str());
+				strcpy(rec.ipAddress, (*i)->getInetAddress().c_str());
+				rec.ipAddressLength = (*i)->getInetAddress().length();
+				rec.identifierLength = (*i)->identifier().length();
+			}
+			m_socket->sendTo(stream.getBufferPtr(), stream.getLength(), *remote);
 			break;
 		}
 		}
