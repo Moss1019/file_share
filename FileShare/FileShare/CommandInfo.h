@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "OutputMemoryStream.h"
 #include "InputMemoryStream.h"
 
@@ -13,7 +15,7 @@ struct CommandInfo
 
 	int dataLength;
 
-	void *data;
+	char data[256];
 
 	void write(OutputMemoryStream &stream) 
 	{

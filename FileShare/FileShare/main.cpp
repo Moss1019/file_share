@@ -13,11 +13,12 @@
 
 #include <iostream>
 
-#include "SockAddress.h"
 #include "UpdSocket.h"
+#include "SockAddress.h"
 #include "CommandInfo.h"
-#include "OutputMemoryStream.h"
+#include "AddressServer.h"
 #include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
 
 
 int main(int argc, const char * argv[])
@@ -29,28 +30,30 @@ int main(int argc, const char * argv[])
     bool isRunning = true;
 
 #ifdef _WIN32
-    SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
+    /*SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
     UdpSocket socket(hostAddr);
     SockAddress remoteAddr(L"192.168.1.176", "Mac", 8081);
     while(isRunning)
     {
-        char buffer[1024];
+        char *buffer = static_cast<char *>(std::malloc(1024));
         unsigned received = socket.receiveFrom(buffer, 1024);
         InputMemoryStream stream(buffer, received);
         CommandInfo info;
+        memset(&info, 0, sizeof(CommandInfo));
         info.read(stream);
+        char *data = static_cast<char *>(info.data);
+        data[info.dataLength] = '\0';
+        std::cout << std::string(data) << std::endl;
         switch(info.type)
         {
             case CMD_DISCONNETED:
             {
                 isRunning = false;
             }
-            case CMD_CONNECTED:
-            {
-                std::cout << std::string(static_cast<const char *>(info.data)) << std::endl;
-            }
         }
-    }
+    }*/
+    AddressServer server(L"192.168.1.100");
+    server.startServer();
 #else
     SockAddress hostAddr("192.168.1.176", "Mac", 8081);
     UdpSocket socket(hostAddr);
@@ -80,7 +83,6 @@ int main(int argc, const char * argv[])
     
 
 #endif
-    socket.closeSocket();
 
 #ifdef _WIN32
     WSACleanup();

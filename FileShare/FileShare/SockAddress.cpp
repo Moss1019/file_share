@@ -25,8 +25,8 @@ SockAddress::SockAddress(const std::string &ipAddress, const std::string &identi
 }
 #endif
 
-SockAddress::SockAddress(const sockaddr &address, const std::string &identifier)
-    :m_identifier(identifier)
+SockAddress::SockAddress(const sockaddr &address)
+    :m_identifier("temp_identifier")
 {
     memcpy(&m_address, &address, sizeof(sockaddr));
 }
