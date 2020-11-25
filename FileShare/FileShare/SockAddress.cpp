@@ -56,7 +56,7 @@ std::string SockAddress::getInetAddress()
 {
     char buffer[INET_ADDRSTRLEN];
     InetNtopA(AF_INET, &(addressAsSockAddrIn()->sin_addr), buffer, INET_ADDRSTRLEN);
-    return std::string(buffer); 
+    return std::string(buffer);
 }
 #else
 std::string SockAddress::getInetAddress()
