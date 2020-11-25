@@ -74,7 +74,7 @@ int main(int argc, const char * argv[])
         }
         strcpy(inputData, input.c_str());
         inputData[input.length()] = '\0';
-        info.data = reinterpret_cast<void *>(inputData);
+        strcpy(info.data, inputData);
         info.dataLength = strlen(inputData);
         OutputMemoryStream stream;
         info.write(stream);
