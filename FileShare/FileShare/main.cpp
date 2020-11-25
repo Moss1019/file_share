@@ -11,6 +11,7 @@
 
 #include <fcntl.h>
 
+#include <cstring>
 #include <iostream>
 
 #include "UpdSocket.h"
@@ -55,7 +56,7 @@ int main(int argc, const char * argv[])
     AddressServer server(L"192.168.1.100");
     server.startServer();
 #else
-    SockAddress hostAddr("192.168.1.176", "Mac", 8081);
+    SockAddress hostAddr("192.168.1.161", "Pi", 8081);
     UdpSocket socket(hostAddr);
     SockAddress remoteAddr("192.168.1.100", "Windows", 8081);
     std::cout << "Waiting\n";
@@ -65,6 +66,10 @@ int main(int argc, const char * argv[])
         std::cin >> input;
         CommandInfo info;
         char inputData[1024];
+        strcpy(inputData, input.c_str());
+        inputData[input.length()] = '\0';
+        strcpy(info.data, inputData);
+        info.dataLength = strlen(inputData);
         info.type = CMD_CONNECTED;
         if (input == "-quit")
         {

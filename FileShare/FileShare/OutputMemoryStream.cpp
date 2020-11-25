@@ -1,6 +1,7 @@
 #include "OutputMemoryStream.h"
 
 #include <memory>
+#include <cstring>
 #include <algorithm>
 
 void OutputMemoryStream::reallocate(int newLength)
