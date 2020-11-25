@@ -15,7 +15,11 @@ private:
 	std::vector<SockAddress *> m_addresses;
 
 public:
+#ifdef _WIN32
 	AddressServer(PCWSTR ipAddress);
+#else
+    
+#endif
 
 	~AddressServer();
 

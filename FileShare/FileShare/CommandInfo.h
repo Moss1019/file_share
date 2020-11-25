@@ -8,7 +8,7 @@ struct CommandInfo
 {
 	int type;
 
-	size_t dataLength;
+	int dataLength;
 
 	void *data;
 };

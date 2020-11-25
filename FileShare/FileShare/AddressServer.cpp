@@ -5,12 +5,16 @@
 
 #include "CommandInfo.h"
 
+#ifdef _WIN32
 AddressServer::AddressServer(PCWSTR ipAddress)
 {
 	SockAddress host(ipAddress, "address_server", 8081);
 	m_socket = new UdpSocket(host);
 	m_isRunning = !m_socket->inError();
 }
+#else
+
+#endif
 
 AddressServer::~AddressServer()
 {

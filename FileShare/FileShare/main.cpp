@@ -27,13 +27,11 @@ int main(int argc, const char * argv[])
     int value = 90;
     auto f = [value](int signal) { std::cout << value << "Hello lambda\n";  };
 
-    std::cout << sizeof(CommandInfo) << std::endl;
-
-    SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
+    SockAddress hostAddr("192.168.1.176", "Host", 8081);
     UdpSocket socket(hostAddr);
-    bool isRunning = true;
+    bool isRunning = false;
 
-    SockAddress remoteAddr(L"192.168.1.176", "Mac", 8081);
+    SockAddress remoteAddr("192.168.1.100", "Remote", 8081);
 
     std::string input;
     while (isRunning)
@@ -53,7 +51,11 @@ int main(int argc, const char * argv[])
         info.type = CMD_CONNECTED;
         socket.sendTo((const char *)&info, input.length() + 8, remoteAddr);
     }
-
+    
+    char buffer[1024];
+    int received = socket.receiveFrom(buffer, 1024);
+    std::cout << received << std::endl;
+    CommandInfo info;
     socket.closeSocket();
 
 #ifdef _WIN32
