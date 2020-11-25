@@ -1,6 +1,7 @@
 #include "InputMemoryStream.h"
 
 #include <memory>
+#include <cstring>
 
 InputMemoryStream::InputMemoryStream(char *buffer, int byteCount)
 	:m_buffer(buffer), m_head(0), m_capacity(byteCount)

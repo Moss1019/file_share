@@ -1,5 +1,7 @@
 #include "SockAddress.h"
 
+#include <cstring>
+
 sockaddr_in *SockAddress::addressAsSockAddrIn()
 {
     return reinterpret_cast<sockaddr_in *>(&m_address);
