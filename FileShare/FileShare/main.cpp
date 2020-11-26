@@ -11,16 +11,17 @@
 
 #include <fcntl.h>
 
+#include <vector>
 #include <cstring>
 #include <iostream>
 
 #include "UpdSocket.h"
 #include "SockAddress.h"
 #include "CommandInfo.h"
+#include "AddressRecord.h"
 #include "AddressServer.h"
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
-
 
 int main(int argc, const char * argv[])
 {
@@ -56,10 +57,7 @@ int main(int argc, const char * argv[])
     AddressServer server(L"192.168.1.100");
     server.startServer();
 #else
-    SockAddress hostAddr("192.168.1.161", "Pi", 8081);
-    UdpSocket socket(hostAddr);
     SockAddress remoteAddr("192.168.1.100", "Windows", 8081);
-    std::cout << "Waiting\n";
     std::string input;
     while (isRunning)
     {
@@ -77,6 +75,10 @@ int main(int argc, const char * argv[])
             info.type = CMD_DISCONNETED;
             isRunning = false;
         }
+        if(input == "addresses")
+        {
+            info.type = CMD_GET_ADDRESSES;
+        }
         strcpy(inputData, input.c_str());
         inputData[input.length()] = '\0';
         strcpy(info.data, inputData);
@@ -84,6 +86,27 @@ int main(int argc, const char * argv[])
         OutputMemoryStream stream;
         info.write(stream);
         socket.sendTo(stream.getBufferPtr(), stream.getLength(), remoteAddr);
+        if(info.type == CMD_GET_ADDRESSES)
+        {
+            char *buffer = static_cast<char *>(std::malloc(1024));
+            int received = socket.receiveFrom(buffer, 1024);
+            std::cout << "Received " << received << " bytes\n";
+            InputMemoryStream stream(buffer, received);
+            std::vector<AddressRecord> records;
+            unsigned numRecords;
+            stream.read(numRecords);
+            std::cout << numRecords << std::endl;
+            for(unsigned i = 0; i < numRecords; ++i)
+            {
+                AddressRecord rec;
+                rec.read(stream);
+                records.push_back(rec);
+            }
+            for(auto i = records.begin(); i != records.end(); ++i)
+            {
+                std::cout << i->identifier << " " << i->ipAddress << std::endl;
+            }
+        }
     }
     
 

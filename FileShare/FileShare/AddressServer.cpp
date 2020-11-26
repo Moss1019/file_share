@@ -77,7 +77,7 @@ void AddressServer::startServer()
 		case CMD_GET_ADDRESSES:
 		{
 			OutputMemoryStream stream;
-			stream.write(m_addresses.size());
+			stream.write(static_cast<unsigned>(m_addresses.size()));
 			for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
 			{
 				AddressRecord rec;
