@@ -52,6 +52,12 @@ void AddressServer::startServer()
 			std::string identifier(data);
 			remote->setIdentifier(identifier);
 			m_addresses.push_back(remote);
+			OutputMemoryStream outStream;
+			fillAddressStream(outStream);
+			for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
+			{
+				m_socket->sendTo(outStream.getBufferPtr(), outStream.getLength(), **i);
+			}
 			break;
 		}
 		case CMD_DISCONNETED:
@@ -71,22 +77,20 @@ void AddressServer::startServer()
 			if(iterator != m_addresses.end())
 			{
 				m_addresses.erase(iterator);
+				OutputMemoryStream outStream;
+				fillAddressStream(outStream);
+				for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
+				{
+					m_socket->sendTo(outStream.getBufferPtr(), outStream.getLength(), **i);
+				}
 			}
 			break;
 		}
 		case CMD_GET_ADDRESSES:
 		{
-			OutputMemoryStream stream;
-			stream.write(m_addresses.size());
-			for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
-			{
-				AddressRecord rec;
-				strcpy(rec.identifier, (*i)->identifier().c_str());
-				strcpy(rec.ipAddress, (*i)->getInetAddress().c_str());
-				rec.ipAddressLength = (*i)->getInetAddress().length();
-				rec.identifierLength = (*i)->identifier().length();
-			}
-			m_socket->sendTo(stream.getBufferPtr(), stream.getLength(), *remote);
+			OutputMemoryStream outStream;
+			fillAddressStream(outStream);
+			m_socket->sendTo(outStream.getBufferPtr(), outStream.getLength(), *remote);
 			break;
 		}
 		}
@@ -100,4 +104,18 @@ void AddressServer::startServer()
 void AddressServer::stopServer()
 {
 	m_isRunning = false;
+}
+
+void AddressServer::fillAddressStream(OutputMemoryStream &stream)
+{
+	stream.write(m_addresses.size());
+	for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
+	{
+		AddressRecord rec;
+		strcpy(rec.identifier, (*i)->identifier().c_str());
+		strcpy(rec.ipAddress, (*i)->getInetAddress().c_str());
+		rec.ipAddressLength = (*i)->getInetAddress().length();
+		rec.identifierLength = (*i)->identifier().length();
+		rec.write(stream);
+	}
 }

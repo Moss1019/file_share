@@ -1,7 +1,6 @@
 
 
 #ifdef _WIN32
-#define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <WinSock2.h>
@@ -9,11 +8,11 @@
 
 #endif
 
-#include <fcntl.h>
-
 #include <cstring>
 #include <iostream>
 
+#include "Chat.h"
+#include "Message.h"
 #include "UpdSocket.h"
 #include "SockAddress.h"
 #include "CommandInfo.h"
@@ -21,6 +20,12 @@
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
+void receivedMsg(InputMemoryStream &stream)
+{
+    Message msg;
+    msg.read(stream);
+    std::cout << msg.identifier << ": " << msg.message << std::endl;
+}
 
 int main(int argc, const char * argv[])
 {
@@ -85,8 +90,6 @@ int main(int argc, const char * argv[])
         info.write(stream);
         socket.sendTo(stream.getBufferPtr(), stream.getLength(), remoteAddr);
     }
-    
-
 #endif
 
 #ifdef _WIN32
