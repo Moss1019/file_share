@@ -79,9 +79,20 @@ int main(int argc, const char * argv[])
     
     std::ifstream inFileStream;
     inFileStream.open("C:/Users/mosso/Desktop/Projects/file_share/FileShare/Debug/file");
-    
+    char *buffer = reinterpret_cast<char *>(std::malloc(128));
     OutputMemoryStream stream;
-    stream.write(10);
+    int bytesRead = 0;
+    while(inFileStream.read(buffer + bytesRead++, 1))
+    {
+        if(bytesRead == 128)
+        {
+            stream.write(buffer, bytesRead);
+            bytesRead = 0;
+        }
+    }
+    std::close(buffer);
+    
+    
     
     int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength(), 0);
     std::cout << "sent stuff " << bytesSent << std::endl;
