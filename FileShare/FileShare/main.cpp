@@ -5,11 +5,11 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #else
-
-#endif
-
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <memory>
+#endif
+
 
 #include <vector>
 #include <cstring>
@@ -76,6 +76,12 @@ int main(int argc, const char * argv[])
         exit(-1);
     }
     
+    OutputMemoryStream stream;
+    stream.write(10);
+    
+    int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength, 0);
+    std::cout << "sent stuff " << bytesSent << std::endl;
+    
     close(sock);
     
 #else
@@ -104,9 +110,18 @@ int main(int argc, const char * argv[])
     unsigned sockLen = sizeof(sockaddr);
     int clientSock = accept(sock, &client, &sockLen);
     
-    
-    
+    sockaddr_in *clientAsIn = reinterpret_cast<sockaddr_in *>(&client);
+    std::cout << "Client connected: " << std::string(inet_ntoa(clientAsIn->sin_addr)) << std::endl;
     std::cout << "this is working" << std::endl;
+    
+    char *buffer = reinterpret_cast<char *>(std::malloc(128)) ;
+    int bytesReceived = recv(sock, buffer, 128, 0);
+    InputMemoryStream stream(buffer, bytesReceived);
+    int value;
+    stream.read(value);
+    
+    std::cout << "Value recevied " << value << std::endl;
+    
     close(clientSock);
     close(sock);
     
