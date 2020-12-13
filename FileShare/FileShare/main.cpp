@@ -10,6 +10,8 @@
 #include <memory>
 #endif
 
+#include <fstream>
+
 #include <vector>
 #include <cstring>
 #include <iostream>
@@ -75,6 +77,9 @@ int main(int argc, const char * argv[])
         exit(-1);
     }
     
+    std::ifstream inFileStream;
+    inFileStream.open("C:/")
+    
     OutputMemoryStream stream;
     stream.write(10);
     
@@ -113,9 +118,16 @@ int main(int argc, const char * argv[])
     std::cout << "Client connected: " << std::string(inet_ntoa(clientAsIn->sin_addr)) << std::endl;
     std::cout << "this is working" << std::endl;
     
-    char *buffer = reinterpret_cast<char *>(std::malloc(128)) ;
-    int bytesReceived = recv(clientSock, buffer, 128, 0);
-    std::cout << "Received bytes " << bytesReceived << std::endl;
+    OutputMemoryStream outStream;
+    int bytesReceived = 0;
+    char *buffer = reinterpret_cast<char *>(std::malloc(128));
+    while((bytesReceived = recv(sock, buffer, 128, 0)) > 0)
+    {
+        outStream.write(buffer, bytesReceived);
+    }
+    std::free(buffer);
+    
+    std::cout << "Received bytes " << outStream.getLength() << std::endl;
     InputMemoryStream stream(buffer, bytesReceived);
     int value;
     stream.read(value);
