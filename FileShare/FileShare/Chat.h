@@ -2,6 +2,7 @@
 
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "UpdSocket.h"
 #include "InputMemoryStream.h"
@@ -16,10 +17,14 @@ private:
 	UdpSocket *m_socket;
 
 	std::thread m_receivingThread;
+    
+    std::vector<SockAddress *> m_peers;
 
 	void (*m_receivedCallback)(InputMemoryStream &stream);
 
 	void receiveHandler();
+    
+    void clearPeers();
 
 public:
 	Chat(const std::string &identifier, void (*receiveCallback)(InputMemoryStream &stream));

@@ -13,21 +13,23 @@ struct CommandInfo
 {
 	int type;
 
-	int dataLength;
-
-	char data[256];
+	std::string data;
 
 	void write(OutputMemoryStream &stream) 
 	{
 		stream.write(type);
-		stream.write(dataLength);
-		stream.write(data, dataLength);
+		stream.write(static_cast<unsigned>(data.length()));
+		stream.write(data.c_str(), data.length());
 	}
 
 	void read(InputMemoryStream &stream)
 	{
 		stream.read(type);
-		stream.read(dataLength);
-		stream.read(data, dataLength);
+        int dataLength;
+        stream.read(dataLength);
+        char dataBuffer[256];
+		stream.read(dataBuffer, dataLength);
+        dataBuffer[dataLength] = '\0';
+        data = std::string(dataBuffer);
 	}
 };

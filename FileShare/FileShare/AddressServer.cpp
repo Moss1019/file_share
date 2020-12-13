@@ -47,9 +47,7 @@ void AddressServer::startServer()
 		{
 		case CMD_CONNECTED:
 		{
-			char *data = cmdInfo.data;
-			data[cmdInfo.dataLength] = '\0';
-			std::string identifier(data);
+			std::string identifier = cmdInfo.data;
 			remote->setIdentifier(identifier);
 			m_addresses.push_back(remote);
 			OutputMemoryStream outStream;
@@ -62,9 +60,7 @@ void AddressServer::startServer()
 		}
 		case CMD_DISCONNETED:
 		{
-			char *data = cmdInfo.data;
-			data[cmdInfo.dataLength] = '\0';
-			std::string identifier(data);
+			std::string identifier = cmdInfo.data;
 			auto iterator = m_addresses.end();
 			for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
 			{
@@ -108,8 +104,7 @@ void AddressServer::stopServer()
 
 void AddressServer::fillAddressStream(OutputMemoryStream &stream)
 {
-	stream.write(11);
-	stream.write(m_addresses.size());
+	stream.write(static_cast<unsigned>(m_addresses.size()));
 	for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
 	{
 		AddressRecord rec;
