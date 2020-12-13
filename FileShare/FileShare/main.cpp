@@ -75,17 +75,13 @@ int main(int argc, const char * argv[])
         exit(-1);
     }
     
-<<<<<<< HEAD
-    closesocket(sock);
-=======
     OutputMemoryStream stream;
     stream.write(10);
     
-    int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength, 0);
+    int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength(), 0);
     std::cout << "sent stuff " << bytesSent << std::endl;
     
-    close(sock);
->>>>>>> 75d56d94b7419dd946ea9d6723f2e328ccc254e2
+    closesocket(sock);
     
 #else
     int sock = socket(AF_INET, SOCK_STREAM, 0);
