@@ -78,7 +78,7 @@ int main(int argc, const char * argv[])
     }
     
     std::ifstream inFileStream;
-    inFileStream.open("C:/")
+    inFileStream.open("C:/Users/mosso/Desktop/Projects/file_share/FileShare/Debug/file");
     
     OutputMemoryStream stream;
     stream.write(10);
