@@ -108,6 +108,7 @@ void AddressServer::stopServer()
 
 void AddressServer::fillAddressStream(OutputMemoryStream &stream)
 {
+	stream.write(11);
 	stream.write(m_addresses.size());
 	for (auto i = m_addresses.begin(); i != m_addresses.end(); ++i)
 	{
