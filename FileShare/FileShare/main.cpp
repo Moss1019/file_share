@@ -115,7 +115,8 @@ int main(int argc, const char * argv[])
     std::cout << "this is working" << std::endl;
     
     char *buffer = reinterpret_cast<char *>(std::malloc(128)) ;
-    int bytesReceived = recv(sock, buffer, 128, 0);
+    int bytesReceived = recv(clientSock, buffer, 128, 0);
+    std::cout << "Received bytes " << bytesReceived << std::endl;
     InputMemoryStream stream(buffer, bytesReceived);
     int value;
     stream.read(value);
