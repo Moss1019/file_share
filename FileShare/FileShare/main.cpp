@@ -1,7 +1,6 @@
 
 
 #ifdef _WIN32
-#define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <WinSock2.h>
@@ -9,12 +8,15 @@
 
 #endif
 
-#include <fcntl.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
 #include <vector>
 #include <cstring>
 #include <iostream>
 
+#include "Chat.h"
+#include "Message.h"
 #include "UpdSocket.h"
 #include "SockAddress.h"
 #include "CommandInfo.h"
@@ -23,93 +25,91 @@
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
+void receivedMsg(InputMemoryStream &stream)
+{
+    int type;
+    stream.read(type);
+    switch(type)
+    {
+        case 11:
+        {
+            std::cout << "Got some addresses\n";
+            break;
+        }
+        case 12:
+        {
+            std::cout << "Got a msg\n";
+            break;
+        }
+    }
+}
+
+bool isRunning = false;
+
+
+
 int main(int argc, const char * argv[])
 {
 #ifdef _WIN32
     WSAData wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 #endif
-    bool isRunning = true;
 
 #ifdef _WIN32
-    /*SockAddress hostAddr(L"192.168.1.100", "Windows", 8081);
-    UdpSocket socket(hostAddr);
-    SockAddress remoteAddr(L"192.168.1.176", "Mac", 8081);
-    while(isRunning)
-    {
-        char *buffer = static_cast<char *>(std::malloc(1024));
-        unsigned received = socket.receiveFrom(buffer, 1024);
-        InputMemoryStream stream(buffer, received);
-        CommandInfo info;
-        memset(&info, 0, sizeof(CommandInfo));
-        info.read(stream);
-        char *data = static_cast<char *>(info.data);
-        data[info.dataLength] = '\0';
-        std::cout << std::string(data) << std::endl;
-        switch(info.type)
-        {
-            case CMD_DISCONNETED:
-            {
-                isRunning = false;
-            }
-        }
-    }*/
-    AddressServer server(L"192.168.1.100");
-    server.startServer();
-#else
-    SockAddress remoteAddr("192.168.1.100", "Windows", 8081);
-    std::string input;
-    while (isRunning)
-    {
-        std::cin >> input;
-        CommandInfo info;
-        char inputData[1024];
-        strcpy(inputData, input.c_str());
-        inputData[input.length()] = '\0';
-        strcpy(info.data, inputData);
-        info.dataLength = strlen(inputData);
-        info.type = CMD_CONNECTED;
-        if (input == "-quit")
-        {
-            std::cin >> input;
-            info.type = CMD_DISCONNETED;
-            isRunning = false;
-        }
-        if(input == "addresses")
-        {
-            info.type = CMD_GET_ADDRESSES;
-        }
-        strcpy(inputData, input.c_str());
-        inputData[input.length()] = '\0';
-        strcpy(info.data, inputData);
-        info.dataLength = strlen(inputData);
-        OutputMemoryStream stream;
-        info.write(stream);
-        socket.sendTo(stream.getBufferPtr(), stream.getLength(), remoteAddr);
-        if(info.type == CMD_GET_ADDRESSES)
-        {
-            char *buffer = static_cast<char *>(std::malloc(1024));
-            int received = socket.receiveFrom(buffer, 1024);
-            std::cout << "Received " << received << " bytes\n";
-            InputMemoryStream stream(buffer, received);
-            std::vector<AddressRecord> records;
-            unsigned numRecords;
-            stream.read(numRecords);
-            std::cout << numRecords << std::endl;
-            for(unsigned i = 0; i < numRecords; ++i)
-            {
-                AddressRecord rec;
-                rec.read(stream);
-                records.push_back(rec);
-            }
-            for(auto i = records.begin(); i != records.end(); ++i)
-            {
-                std::cout << i->identifier << " " << i->ipAddress << std::endl;
-            }
-        }
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in host;
+    memset(&host, 0, sizeof(sockaddr_in));
+    InetPton(AF_INET, L"192.168.1.100", &host.sin_addr);
+    host.sin_family = AF_INET;
+    host.sin_port = htons(8080);
+    bind(sock, reinterpret_cast<sockaddr *>(&host));
+    
+    sockaddr_in remote;
+    memset(&remote, 0, sizeof(sockaddr_in));
+    InetPton(AF_INET, L"192.168.1.176", &remote.sin_addr);
+    remote.sin_family = AF_INET;
+    remote.sin_port = htons(8080);
+    
+    if(connect(sock, reinterpret_cast<sockaddr *>(&remote), sizeof(sockaddrr)) < 0) {
+        std::cerr << "Could not connect to remote server" << std::endl;
+        close(sock);
+        exit(-1);
     }
     
-
+    close(sock);
+    
+#else
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(sock < -1) {
+        std::cerr << "Could not create socket" << std::endl;
+        exit(-1);
+    }
+    
+    sockaddr_in host;
+    memset(&host, 0, sizeof(sockaddr_in));
+    inet_pton(AF_INET, "192.168.1.176", &host.sin_addr);
+    host.sin_family = AF_INET;
+    host.sin_port = htons(8080);
+    
+    if(bind(sock, reinterpret_cast<sockaddr *>(&host), sizeof(sockaddr)) < 0) {
+        std::cerr << "Could not bind socket to host" << std::endl;
+        close(sock);
+        exit(-1);
+    }
+    
+    sockaddr client;
+    memset(&client, 0, sizeof(sockaddr));
+    listen(sock, 3);
+    
+    unsigned sockLen = sizeof(sockaddr);
+    int clientSock = accept(sock, &client, &sockLen);
+    
+    
+    
+    std::cout << "this is working" << std::endl;
+    close(clientSock);
+    close(sock);
+    
 #endif
 
 #ifdef _WIN32

@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "OutputMemoryStream.h"
 #include "SockAddress.h"
 #include "UpdSocket.h"
 
@@ -13,6 +14,8 @@ private:
 	UdpSocket *m_socket;
 
 	std::vector<SockAddress *> m_addresses;
+
+	void fillAddressStream(OutputMemoryStream &stream);
 
 public:
 #ifdef _WIN32
