@@ -10,7 +10,6 @@
 #include <memory>
 #endif
 
-
 #include <vector>
 #include <cstring>
 #include <iostream>
@@ -62,7 +61,7 @@ int main(int argc, const char * argv[])
     InetPton(AF_INET, L"192.168.1.100", &host.sin_addr);
     host.sin_family = AF_INET;
     host.sin_port = htons(8080);
-    bind(sock, reinterpret_cast<sockaddr *>(&host));
+    bind(sock, reinterpret_cast<sockaddr *>(&host), sizeof(sockaddr));
     
     sockaddr_in remote;
     memset(&remote, 0, sizeof(sockaddr_in));
@@ -70,19 +69,19 @@ int main(int argc, const char * argv[])
     remote.sin_family = AF_INET;
     remote.sin_port = htons(8080);
     
-    if(connect(sock, reinterpret_cast<sockaddr *>(&remote), sizeof(sockaddrr)) < 0) {
+    if(connect(sock, reinterpret_cast<sockaddr *>(&remote), sizeof(sockaddr)) < 0) {
         std::cerr << "Could not connect to remote server" << std::endl;
-        close(sock);
+        closesocket(sock);
         exit(-1);
     }
     
     OutputMemoryStream stream;
     stream.write(10);
     
-    int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength, 0);
+    int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength(), 0);
     std::cout << "sent stuff " << bytesSent << std::endl;
     
-    close(sock);
+    closesocket(sock);
     
 #else
     int sock = socket(AF_INET, SOCK_STREAM, 0);

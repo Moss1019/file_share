@@ -15,9 +15,9 @@ class SockAddress
 private:
 	sockaddr m_address;
 
-	sockaddr_in *addressAsSockAddrIn();
-
 	std::string m_identifier;
+
+	sockaddr_in *addressAsSockAddrIn();
 
 public:
 #ifdef _WIN32
