@@ -106,6 +106,8 @@ int main(int argc, const char * argv[])
         exit(-1);
     }
     
+    std::cout << "Waiting for this shit" << std::endl;
+    
     sockaddr_in host;
     memset(&host, 0, sizeof(sockaddr_in));
     inet_pton(AF_INET, "192.168.1.176", &host.sin_addr);
@@ -132,18 +134,19 @@ int main(int argc, const char * argv[])
     OutputMemoryStream outStream;
     int bytesReceived = 0;
     char *buffer = reinterpret_cast<char *>(std::malloc(128));
-    while((bytesReceived = recv(sock, buffer, 128, 0)) > 0)
+    while((bytesReceived = recv(clientSock, buffer, 128, 0)) > 0)
     {
+        std::cout << bytesReceived << std::endl;
         outStream.write(buffer, bytesReceived);
     }
-    std::free(buffer);
+    
+    std::ofstream outFile("/Users/mossonthetree/Desktop/c++/ReadFile/fileout");
+    outFile.write(outStream.getBufferPtr(), outStream.getLength() - 1);
+    outFile.close();
     
     std::cout << "Received bytes " << outStream.getLength() << std::endl;
     InputMemoryStream stream(buffer, bytesReceived);
-    int value;
-    stream.read(value);
     
-    std::cout << "Value recevied " << value << std::endl;
     
     close(clientSock);
     close(sock);
