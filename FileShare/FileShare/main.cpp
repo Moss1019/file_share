@@ -26,6 +26,8 @@
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
+#include "TcpSocket.h"
+
 void receivedMsg(InputMemoryStream &stream)
 {
     int type;
@@ -90,9 +92,8 @@ int main(int argc, const char * argv[])
             bytesRead = 0;
         }
     }
-    std::close(buffer);
-    
-    
+    stream.write(buffer, bytesRead);
+    std::free(buffer);
     
     int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength(), 0);
     std::cout << "sent stuff " << bytesSent << std::endl;

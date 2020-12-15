@@ -11,6 +11,8 @@ private:
 public:
 	InputMemoryStream(char *buffer, int byteCount);
 
+	InputMemoryStream(const char *buffer, int byteCount);
+
 	~InputMemoryStream();
 
 	unsigned getRemainingSize() const;

@@ -142,10 +142,13 @@
   <ItemGroup>
     <ClCompile Include="AddressServer.cpp" />
     <ClCompile Include="Chat.cpp" />
+    <ClCompile Include="FileReceiver.cpp" />
     <ClCompile Include="InputMemoryStream.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OutputMemoryStream.cpp" />
     <ClCompile Include="SockAddress.cpp" />
+    <ClCompile Include="TcpConnection.cpp" />
+    <ClCompile Include="TcpSocket.cpp" />
     <ClCompile Include="UpdSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,10 +156,13 @@
     <ClInclude Include="AddressServer.h" />
     <ClInclude Include="Chat.h" />
     <ClInclude Include="CommandInfo.h" />
+    <ClInclude Include="FileReceiver.h" />
     <ClInclude Include="InputMemoryStream.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="OutputMemoryStream.h" />
     <ClInclude Include="SockAddress.h" />
+    <ClInclude Include="TcpConnection.h" />
+    <ClInclude Include="TcpSocket.h" />
     <ClInclude Include="UpdSocket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
