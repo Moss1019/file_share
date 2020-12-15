@@ -8,6 +8,12 @@ InputMemoryStream::InputMemoryStream(char *buffer, int byteCount)
 {
 }
 
+InputMemoryStream::InputMemoryStream(const char *buffer, int byteCount)
+	: m_head(0), m_capacity(byteCount)
+{
+	std::memcpy(m_buffer, buffer, byteCount);
+}
+
 InputMemoryStream::~InputMemoryStream()
 {
 	std::free(m_buffer);
