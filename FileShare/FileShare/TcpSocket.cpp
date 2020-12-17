@@ -1,74 +1,51 @@
-#include "TcpSocket.h"
+#pragma once
 
 #ifdef _WIN32
-#include <WinSock2.h>
+#define sockaddrLen int
 #else
-
+#define sockaddrLen socklen_t
 #endif
 
-#include <string>
-
+#include "TcpSocket.h"
 #include "TcpConnection.h"
 
-void TcpSocket::acceptConnection()
+void  TcpSocket::listenFunction()
 {
+    listen(m_sock, 2);
+    while(m_isRunning)
+    {
+        sockaddrLen clientAddrSize = sizeof(sockaddr);
+        sockaddr clientAddr;
+        memset(&clientAddr, 0, sizeof(sockaddr));
 #ifdef _WIN32
-	SOCKET newClientSock;
+        SOCKET clientSock = accept(m_sock, &clientAddr, &clientAddrSize);
 #else
-	int newClientSock;
+        int clientSock = accept(m_sock, &clientAddr, &clientAddrSize);
 #endif
-	sockaddr newClient;
-	memset(&newClient, 0, sizeof(sockaddr));
-	int clientAddrLen = sizeof(sockaddr);
-	while (m_isRunning)
-	{
-		newClientSock = accept(m_sock, &newClient, &clientAddrLen);
-		if (newClientSock > 0)
-		{
-			TcpConnection con(newClientSock, receiveCallback);
-		}
-	}
+        TcpConnection connection(clientSock, m_receiveCallback);
+    }
 }
 
-TcpSocket::TcpSocket(const SockAddress &host, void (*receiveCallback)(InputMemoryStream &stream))
-	:receiveCallback(receiveCallback)
+TcpSocket::TcpSocket(SockAddress *host, void (*receiveCallback)(InputMemoryStream &stream))
+    :m_host(host), m_receiveCallback(receiveCallback)
 {
-	m_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (m_sock < 0)
-	{
-		m_errorMsg = "Failed to create tcp socket";
-		m_inError = true;
-	}
-	if (!m_inError)
-	{
-		if (bind(m_sock, host.address(), host.addressLen()) < 0)
-		{
-			m_errorMsg = "Bind failed";
-			m_inError = true;
-		}
-	}
-	if (!m_inError)
-	{
-		if (listen(m_sock, 5) < 0)
-		{
-			m_errorMsg = "Failed to start listening";
-			m_inError = true;
-		}
-	}
-	m_isRunning = !m_inError;
+    m_sock = socket(AF_INET, SOCK_STREAM, 0);
+    bind(m_sock, m_host->address(), m_host->addressLen());
 }
 
-TcpSocket::~TcpSocket()
+void TcpSocket::start()
 {
-	stop();
+    m_listenThread = new std::thread(&TcpSocket::listenFunction, this);
 }
 
 void TcpSocket::stop()
 {
-	m_isRunning = false;
-	if (m_listenThread != nullptr)
-	{
-		delete m_listenThread;
-		m_listenThread = nullptr;
-	}
+    m_isRunning = false;
+    if(m_listenThread != nullptr)
+    {
+        m_listenThread->join();
+        delete m_listenThread;
+        m_listenThread = nullptr;
+    }
 }
+

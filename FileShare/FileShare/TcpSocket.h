@@ -6,7 +6,6 @@
 #include <arpa/inet.h>
 #endif
 
-#include <string>
 #include <thread>
 
 #include "SockAddress.h"
@@ -16,32 +15,26 @@ class TcpSocket
 {
 private:
 #ifdef _WIN32
-	SOCKET m_sock;
+    SOCKET m_sock;
 #else
-	int m_sock;
+    int m_sock;
 #endif
-
-	bool m_isRunning = false;
-
-	bool m_inError = false;
-
-	std::thread *m_listenThread = nullptr;
-
-	std::string m_errorMsg;
-
-	void acceptConnection();
-
-	void (*receiveCallback)(InputMemoryStream &stream);
+    
+    bool m_isRunning = false;
+    
+    SockAddress *m_host = nullptr;
+    
+    std::thread *m_listenThread = nullptr;
+    
+    void (*m_receiveCallback)(InputMemoryStream &stream);
+    
+    void listenFunction();
 
 public:
-	TcpSocket(const SockAddress &host, void (*receiveCallback)(InputMemoryStream &stream));
-
-	TcpSocket(const TcpSocket &other) = delete;
-
-	TcpSocket &operator=(const TcpSocket &other) = delete;
-
-	~TcpSocket();
-
-	void stop();
+    TcpSocket(SockAddress *host, void (*receiveCallback)(InputMemoryStream &stream));
+    
+    void start();
+    
+    void stop();
 };
 

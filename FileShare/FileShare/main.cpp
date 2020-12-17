@@ -19,14 +19,15 @@
 #include "Chat.h"
 #include "Message.h"
 #include "UpdSocket.h"
+#include "TcpSocket.h"
 #include "SockAddress.h"
 #include "CommandInfo.h"
+#include "TcpConnection.h"
 #include "AddressRecord.h"
 #include "AddressServer.h"
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
-#include "TcpSocket.h"
 
 void receivedMsg(InputMemoryStream &stream)
 {
@@ -49,7 +50,10 @@ void receivedMsg(InputMemoryStream &stream)
 
 bool isRunning = false;
 
-
+void receivedData(InputMemoryStream &stream)
+{
+    std::cout << "Got some data\n";
+}
 
 int main(int argc, const char * argv[])
 {
@@ -59,99 +63,22 @@ int main(int argc, const char * argv[])
 #endif
 
 #ifdef _WIN32
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    sockaddr_in host;
-    memset(&host, 0, sizeof(sockaddr_in));
-    InetPton(AF_INET, L"192.168.1.100", &host.sin_addr);
-    host.sin_family = AF_INET;
-    host.sin_port = htons(8080);
-    bind(sock, reinterpret_cast<sockaddr *>(&host), sizeof(sockaddr));
-    
-    sockaddr_in remote;
-    memset(&remote, 0, sizeof(sockaddr_in));
-    InetPton(AF_INET, L"192.168.1.176", &remote.sin_addr);
-    remote.sin_family = AF_INET;
-    remote.sin_port = htons(8080);
-    
-    if(connect(sock, reinterpret_cast<sockaddr *>(&remote), sizeof(sockaddr)) < 0) {
-        std::cerr << "Could not connect to remote server" << std::endl;
-        closesocket(sock);
-        exit(-1);
-    }
-    
-    std::ifstream inFileStream;
-    inFileStream.open("C:/Users/mosso/Desktop/Projects/file_share/FileShare/Debug/file");
-    char *buffer = reinterpret_cast<char *>(std::malloc(128));
+    SockAddress host(L"192.168.1.100", "windows", 8080);
+    SockAddress remote(L"192.168.1.176", "mac", 8080);
+    TcpConnection client(&host, &remote, receivedData);
     OutputMemoryStream stream;
-    int bytesRead = 0;
-    while(inFileStream.read(buffer + bytesRead++, 1))
-    {
-        if(bytesRead == 128)
-        {
-            stream.write(buffer, bytesRead);
-            bytesRead = 0;
-        }
-    }
-    stream.write(buffer, bytesRead);
-    std::free(buffer);
-    
-    int bytesSent = send(sock, stream.getBufferPtr(), stream.getLength(), 0);
-    std::cout << "sent stuff " << bytesSent << std::endl;
-    
-    closesocket(sock);
-    
+    stream.write(10);
+    client.sendData(stream);
+    int x;
+    std::cin >> x;
 #else
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if(sock < -1) {
-        std::cerr << "Could not create socket" << std::endl;
-        exit(-1);
-    }
-    
-    std::cout << "Waiting for this shit" << std::endl;
-    
-    sockaddr_in host;
-    memset(&host, 0, sizeof(sockaddr_in));
-    inet_pton(AF_INET, "192.168.1.176", &host.sin_addr);
-    host.sin_family = AF_INET;
-    host.sin_port = htons(8080);
-    
-    if(bind(sock, reinterpret_cast<sockaddr *>(&host), sizeof(sockaddr)) < 0) {
-        std::cerr << "Could not bind socket to host" << std::endl;
-        close(sock);
-        exit(-1);
-    }
-    
-    sockaddr client;
-    memset(&client, 0, sizeof(sockaddr));
-    listen(sock, 3);
-    
-    unsigned sockLen = sizeof(sockaddr);
-    int clientSock = accept(sock, &client, &sockLen);
-    
-    sockaddr_in *clientAsIn = reinterpret_cast<sockaddr_in *>(&client);
-    std::cout << "Client connected: " << std::string(inet_ntoa(clientAsIn->sin_addr)) << std::endl;
-    std::cout << "this is working" << std::endl;
-    
-    OutputMemoryStream outStream;
-    int bytesReceived = 0;
-    char *buffer = reinterpret_cast<char *>(std::malloc(128));
-    while((bytesReceived = recv(clientSock, buffer, 128, 0)) > 0)
-    {
-        std::cout << bytesReceived << std::endl;
-        outStream.write(buffer, bytesReceived);
-    }
-    
-    std::ofstream outFile("/Users/mossonthetree/Desktop/c++/ReadFile/fileout");
-    outFile.write(outStream.getBufferPtr(), outStream.getLength() - 1);
-    outFile.close();
-    
-    std::cout << "Received bytes " << outStream.getLength() << std::endl;
-    InputMemoryStream stream(buffer, bytesReceived);
-    
-    
-    close(clientSock);
-    close(sock);
-    
+    SockAddress host("192.169.1.176", "mac", 8080);
+    TcpSocket socket(&host, receivedData);
+    socket.start();
+    int x;
+    std::cin >> x;
+    socket.stop();
+    std::cout << "Done" << std::endl;
 #endif
 
 #ifdef _WIN32

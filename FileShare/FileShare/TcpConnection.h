@@ -10,36 +10,30 @@
 
 #include "SockAddress.h"
 #include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
 
 class TcpConnection
 {
 private:
 #ifdef _WIN32
-	SOCKET m_sock;
+    SOCKET m_sock;
 #else
-	int m_sock;
+    int m_sock;
 #endif
-
-	SockAddress *m_remote;
-
-	std::thread *m_receiveThread = nullptr;
-
-	void (*receiveCallback)(InputMemoryStream &stream);
-
-	void receive();
+    
+    std::thread *m_receiveThread = nullptr;
+    
+    void (*m_receiveCallback)(InputMemoryStream &stream);
+    
+    void receiveFunction();
 
 public:
-#ifdef _WIN32
-	TcpConnection(SOCKET sock, void (*receiveCallback)(InputMemoryStream &stream));
-#else
-	TcpConnection(int sock);
-#endif
+    TcpConnection(int sock, void (*receiveCallback)(InputMemoryStream &stream));
+    
+    TcpConnection(SockAddress *host, SockAddress *remote, void (*receiveCallback)(InputMemoryStream &stream));
+    
+    ~TcpConnection();
 
-	TcpConnection(TcpConnection &other) = delete;
-
-	TcpConnection &operator=(const TcpConnection &other) = delete;
-
-	~TcpConnection();
-
+    int sendData(OutputMemoryStream &stream);
 };
 
