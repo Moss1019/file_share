@@ -1,60 +1,54 @@
-#pragma once
 
-#ifdef _WIN32
-#define sockaddrLen int
-#include <WinSock2.h>
-#else
-#define sockaddrLen socklen_t
-#endif
+#include "TcpSocket.hpp"
 
 #include <iostream>
 
-#include "TcpSocket.h"
-#include "TcpConnection.h"
-
-void  TcpSocket::listenFunction()
-{
-    while(m_isRunning)
-    {
-        sockaddrLen clientAddrSize = sizeof(sockaddr);
-        sockaddr clientAddr;
-        memset(&clientAddr, 0, sizeof(sockaddr));
-#ifdef _WIN32
-        SOCKET clientSock = accept(m_sock, &clientAddr, &clientAddrSize);
-#else
-        int clientSock = accept(m_sock, &clientAddr, &clientAddrSize);
-#endif
-        TcpConnection connection(clientSock, m_receiveCallback);
-    }
-}
-
-TcpSocket::TcpSocket(SockAddress *host, void (*receiveCallback)(InputMemoryStream &stream))
-    :m_host(host), m_receiveCallback(receiveCallback)
+TcpSocket::TcpSocket(const SockAddress &addr)
 {
     m_sock = socket(AF_INET, SOCK_STREAM, 0);
-    sockaddr_in shost;
-    memset(&shost, 0, sizeof(sockaddr_in));
-    InetPton(AF_INET, L"192.168.1.100", &shost.sin_addr);
-    shost.sin_family = AF_INET;
-    shost.sin_port = htons(8080);
-    std::cout << bind(m_sock, host->address(), sizeof(sockaddr)) << std::endl;
-    //std::cout << bind(m_sock, m_host->address(), m_host->addressLen()) << std::endl;
-    std::cout << listen(m_sock, 2) << std::endl;
-}
-
-void TcpSocket::start()
-{
-    m_listenThread = new std::thread(&TcpSocket::listenFunction, this);
-}
-
-void TcpSocket::stop()
-{
-    m_isRunning = false;
-    if(m_listenThread != nullptr)
+    if(m_sock < 0)
     {
-        m_listenThread->join();
-        delete m_listenThread;
-        m_listenThread = nullptr;
+        m_inError = true;
+        m_errorMsg = "Socket creation failed";
     }
+    if(bind(m_sock, addr.constAddress(), addr.addressLen()) < 0)
+    {
+        m_inError = true;
+        m_errorMsg = "Socket binding failed";
+    }
+    m_isRunning = !m_inError;
 }
 
+TcpSocket::~TcpSocket()
+{
+    close(m_sock);
+}
+
+bool TcpSocket::start()
+{
+    if(listen(m_sock, 2) < 0)
+    {
+        return false;
+    }
+    while(m_isRunning)
+    {
+        sockaddr clientAddress;
+        memset(&clientAddress, 0, sizeof(sockaddr));
+        sockaddrLen clientAddrSize = sizeof(sockaddr);
+        int client = accept(m_sock, &clientAddress, &clientAddrSize);
+        std::cout << inet_ntoa((reinterpret_cast<sockaddr_in *>(&clientAddress))->sin_addr);
+        close(client);
+        m_isRunning = false;
+    }
+    return true;
+}
+
+bool TcpSocket::inError() const
+{
+    return m_inError;
+}
+
+const std::string &TcpSocket::errorMsg() const
+{
+    return m_errorMsg;
+}
