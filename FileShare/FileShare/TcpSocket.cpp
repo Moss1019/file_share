@@ -1,5 +1,5 @@
 
-#include "TcpSocket.hpp"
+#include "TcpSocket.h"
 
 #include <iostream>
 
@@ -21,7 +21,11 @@ TcpSocket::TcpSocket(const SockAddress &addr)
 
 TcpSocket::~TcpSocket()
 {
+#ifdef _WIN32
+    closesocket(m_sock);
+#else
     close(m_sock);
+#endif
 }
 
 bool TcpSocket::start()
@@ -36,8 +40,11 @@ bool TcpSocket::start()
         memset(&clientAddress, 0, sizeof(sockaddr));
         sockaddrLen clientAddrSize = sizeof(sockaddr);
         int client = accept(m_sock, &clientAddress, &clientAddrSize);
-        std::cout << inet_ntoa((reinterpret_cast<sockaddr_in *>(&clientAddress))->sin_addr);
+#ifdef _WIN32
+        closesocket(client);
+#else
         close(client);
+#endif
         m_isRunning = false;
     }
     return true;

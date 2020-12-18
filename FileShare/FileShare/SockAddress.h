@@ -1,3 +1,4 @@
+
 #pragma once
 
 #ifdef _WIN32
@@ -5,43 +6,21 @@
 #include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
+#include <sys/socket.h>
 #endif
 
 #include <string>
-#include <memory>
 
 class SockAddress
 {
 private:
-	sockaddr m_address;
-
-	std::string m_identifier;
-
-	sockaddr_in *addressAsSockAddrIn();
-
+    sockaddr m_addr;
 public:
-#ifdef _WIN32
-	SockAddress(const PCWSTR ipAddress, const std::string &identifier, unsigned short port);
-#else 
-	SockAddress(const std::string &ipAddress, const std::string &identifier, unsigned short port);
-#endif
+    SockAddress(const std::string &ipAddress, unsigned short port);
 
-	SockAddress(const sockaddr &address);
-
-	const sockaddr *address() const;
-
-	unsigned addressLen() const;
-
-	const std::string &identifier() const;
-
-	void setIdentifier(const std::string &identifier);
-
-	std::string getInetAddress();
-
-	SockAddress(const SockAddress &other) = delete;
-
-	SockAddress &operator=(const SockAddress &other) = delete;
+    SockAddress(const sockaddr &remote);
+    
+    const sockaddr *constAddress() const;
+    
+    unsigned addressLen() const;
 };
-
-typedef std::shared_ptr<SockAddress> SockAddressPtr;
-

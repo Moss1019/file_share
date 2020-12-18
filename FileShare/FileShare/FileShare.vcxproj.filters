@@ -15,16 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SockAddress.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UpdSocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AddressServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputMemoryStream.cpp">
@@ -33,13 +27,10 @@
     <ClCompile Include="OutputMemoryStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Chat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FileReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TcpSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SockAddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpConnection.cpp">
@@ -47,16 +38,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SockAddress.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UpdSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AddressServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputMemoryStream.h">
@@ -65,19 +47,13 @@
     <ClInclude Include="OutputMemoryStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AddressRecord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Chat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileReceiver.h">
+    <ClInclude Include="TcpSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TcpSocket.h">
+    <ClInclude Include="SockAddress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TcpConnection.h">

@@ -11,7 +11,7 @@ UdpSocket::UdpSocket(const SockAddress &address)
 	}
 	else
 	{
-		int bindRed = bind(m_sock, address.address(), address.addressLen());
+		int bindRed = bind(m_sock, address.constAddress(), address.addressLen());
 		if (bindRed < 0)
 		{
 			m_inError = true;
@@ -41,7 +41,7 @@ int UdpSocket::sendTo(const char *data, unsigned dataSize, const SockAddress &de
 	{
 		return -1;
 	}
-	int bytesSent = sendto(m_sock, data, dataSize, 0, destination.address(), destination.addressLen());
+	int bytesSent = sendto(m_sock, data, dataSize, 0, destination.constAddress(), destination.addressLen());
 	if (bytesSent < 0)
 	{
 		m_inError = true;

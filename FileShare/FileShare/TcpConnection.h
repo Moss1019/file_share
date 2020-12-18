@@ -6,34 +6,28 @@
 
 #endif
 
-#include <thread>
+#include <string>
 
 #include "SockAddress.h"
-#include "InputMemoryStream.h"
-#include "OutputMemoryStream.h"
 
 class TcpConnection
 {
 private:
-#ifdef _WIN32
-    SOCKET m_sock;
-#else
-    int m_sock;
-#endif
-    
-    std::thread *m_receiveThread = nullptr;
-    
-    void (*m_receiveCallback)(InputMemoryStream &stream);
-    
-    void receiveFunction();
+	SOCKET m_sock;
+
+	bool m_inError = false;
+
+	bool m_isRunning = false;
+
+	std::string m_errorMsg;
 
 public:
-    TcpConnection(int sock, void (*receiveCallback)(InputMemoryStream &stream));
-    
-    TcpConnection(SockAddress *host, SockAddress *remote, void (*receiveCallback)(InputMemoryStream &stream));
-    
-    ~TcpConnection();
+	TcpConnection(const SockAddress &host, const SockAddress &remote);
 
-    int sendData(OutputMemoryStream &stream);
+	~TcpConnection();
+
+	bool inError() const;
+
+	const std::string &errorMsg() const;
 };
 

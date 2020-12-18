@@ -140,9 +140,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AddressServer.cpp" />
-    <ClCompile Include="Chat.cpp" />
-    <ClCompile Include="FileReceiver.cpp" />
     <ClCompile Include="InputMemoryStream.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OutputMemoryStream.cpp" />
@@ -152,11 +149,6 @@
     <ClCompile Include="UpdSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AddressRecord.h" />
-    <ClInclude Include="AddressServer.h" />
-    <ClInclude Include="Chat.h" />
-    <ClInclude Include="CommandInfo.h" />
-    <ClInclude Include="FileReceiver.h" />
     <ClInclude Include="InputMemoryStream.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="OutputMemoryStream.h" />

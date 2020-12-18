@@ -1,40 +1,40 @@
+
 #pragma once
+
+
+#include <string>
 
 #ifdef _WIN32
 #include <WinSock2.h>
+
+#define sockaddrLen int
 #else
-#include <arpa/inet.h>
+#include <unistd.h>
+
+#define sockaddrLen socklen_t
 #endif
 
-#include <thread>
-
 #include "SockAddress.h"
-#include "InputMemoryStream.h"
 
 class TcpSocket
 {
 private:
-#ifdef _WIN32
-    SOCKET m_sock;
-#else
     int m_sock;
-#endif
     
     bool m_isRunning = false;
     
-    SockAddress *m_host = nullptr;
+    bool m_inError = false;
     
-    std::thread *m_listenThread = nullptr;
+    std::string m_errorMsg;
     
-    void (*m_receiveCallback)(InputMemoryStream &stream);
-    
-    void listenFunction();
-
 public:
-    TcpSocket(SockAddress *host, void (*receiveCallback)(InputMemoryStream &stream));
+    TcpSocket(const SockAddress &addr);
     
-    void start();
+    ~TcpSocket();
     
-    void stop();
+    bool start();
+    
+    bool inError() const;
+    
+    const std::string &errorMsg() const;
 };
-

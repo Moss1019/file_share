@@ -1,68 +1,35 @@
+
 #include "SockAddress.h"
 
-#include <cstring>
-
-sockaddr_in *SockAddress::addressAsSockAddrIn()
+SockAddress::SockAddress(const std::string &ipAddress, unsigned short port)
 {
-    return reinterpret_cast<sockaddr_in *>(&m_address);
-}
-
+    sockaddr_in host;
+    memset(&host, 0, sizeof(sockaddr_in));
 #ifdef _WIN32
-SockAddress::SockAddress(const PCWSTR ipAddress, const std::string &identifier, unsigned short port)
-    :m_identifier(identifier)
-{
-    memset(&m_address, 0, sizeof(sockaddr));
-    addressAsSockAddrIn()->sin_family = PF_INET;
-    addressAsSockAddrIn()->sin_port = htons(port);
-    InetPton(AF_INET, ipAddress, &addressAsSockAddrIn()->sin_addr);
-}
-#else 
-SockAddress::SockAddress(const std::string &ipAddress, const std::string &identifier, unsigned short port)
-    :m_identifier(identifier)
-{
-    memset(&m_address, 0, sizeof(sockaddr));
-    addressAsSockAddrIn()->sin_family = PF_INET;
-    addressAsSockAddrIn()->sin_port = htons(port);
-    inet_pton(AF_INET, ipAddress.c_str(), &addressAsSockAddrIn()->sin_addr);
-}
+    wchar_t wIpAddress[17];
+    unsigned numChars = ipAddress.length();
+    mbstowcs_s(&numChars, wIpAddress, ipAddress.c_str(), ipAddress.length());
+    wIpAddress[numChars] = '\0';
+    InetPton(AF_INET, wIpAddress, &host.sin_addr);
+#else
+    inet_pton(AF_INET, ipAddress.c_str(), &host.sin_addr);
 #endif
-
-SockAddress::SockAddress(const sockaddr &address)
-    :m_identifier("temp_identifier")
-{
-    memcpy(&m_address, &address, sizeof(sockaddr));
+    host.sin_family = AF_INET;
+    host.sin_port = htons(port);
+    m_addr = *(reinterpret_cast<sockaddr *>(&host));
 }
 
-const sockaddr *SockAddress::address() const
+SockAddress::SockAddress(const sockaddr &remote)
 {
-    return &m_address;
+    memcpy(&m_addr, &remote, sizeof(sockaddr));
+}
+
+const sockaddr *SockAddress::constAddress() const
+{
+    return &m_addr;
 }
 
 unsigned SockAddress::addressLen() const
 {
     return sizeof(sockaddr);
 }
-
-const std::string &SockAddress::identifier() const
-{
-    return m_identifier;
-}
-
-void SockAddress::setIdentifier(const std::string &identifier)
-{
-    m_identifier = identifier;
-}
-
-#ifdef _WIN32
-std::string SockAddress::getInetAddress()
-{
-    char buffer[INET_ADDRSTRLEN];
-    InetNtopA(AF_INET, &(addressAsSockAddrIn()->sin_addr), buffer, INET_ADDRSTRLEN);
-    return std::string(buffer);
-}
-#else
-std::string SockAddress::getInetAddress()
-{
-    return std::string(inet_ntoa(addressAsSockAddrIn()->sin_addr));
-}
-#endif
