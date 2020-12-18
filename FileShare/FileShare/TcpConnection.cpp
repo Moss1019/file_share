@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #endif
 
+#include <iostream>
+
 #include "OutputMemoryStream.h"
 
 #define BUFFERSIZE 512
@@ -25,7 +27,7 @@ void TcpConnection::receiveFunction()
 }
 
 TcpConnection::TcpConnection(int sock, void (*receiveCallback)(InputMemoryStream &stream))
-    :m_sock(sock), m_receiveCallback(receiveCallback)
+    :m_sock(sock), m_receiveCallback{ receiveCallback }
 {
     m_receiveThread = new std::thread(&TcpConnection::receiveFunction, this);
 }
@@ -35,7 +37,7 @@ TcpConnection::TcpConnection(SockAddress *host, SockAddress *remote, void (*rece
 {
     m_sock = socket(AF_INET, SOCK_STREAM, 0);
     bind(m_sock, host->address(), host->addressLen());
-    connect(m_sock, remote->address(), remote->addressLen());
+    std::cout << connect(m_sock, remote->address(), remote->addressLen());
     m_receiveThread = new std::thread(&TcpConnection::receiveFunction, this);
 }
 
@@ -46,7 +48,11 @@ TcpConnection::~TcpConnection()
         m_receiveThread->join();
         delete m_receiveThread;
         m_receiveThread = nullptr;
-        close(m_sock);
+#ifdef _WIN32
+        closesocket(m_sock);
+#else
+
+#endif
     }
 }
 

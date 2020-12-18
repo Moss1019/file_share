@@ -2,16 +2,18 @@
 
 #ifdef _WIN32
 #define sockaddrLen int
+#include <WinSock2.h>
 #else
 #define sockaddrLen socklen_t
 #endif
+
+#include <iostream>
 
 #include "TcpSocket.h"
 #include "TcpConnection.h"
 
 void  TcpSocket::listenFunction()
 {
-    listen(m_sock, 2);
     while(m_isRunning)
     {
         sockaddrLen clientAddrSize = sizeof(sockaddr);
@@ -30,7 +32,14 @@ TcpSocket::TcpSocket(SockAddress *host, void (*receiveCallback)(InputMemoryStrea
     :m_host(host), m_receiveCallback(receiveCallback)
 {
     m_sock = socket(AF_INET, SOCK_STREAM, 0);
-    bind(m_sock, m_host->address(), m_host->addressLen());
+    sockaddr_in shost;
+    memset(&shost, 0, sizeof(sockaddr_in));
+    InetPton(AF_INET, L"192.168.1.100", &shost.sin_addr);
+    shost.sin_family = AF_INET;
+    shost.sin_port = htons(8080);
+    std::cout << bind(m_sock, host->address(), sizeof(sockaddr)) << std::endl;
+    //std::cout << bind(m_sock, m_host->address(), m_host->addressLen()) << std::endl;
+    std::cout << listen(m_sock, 2) << std::endl;
 }
 
 void TcpSocket::start()

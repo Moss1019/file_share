@@ -32,8 +32,8 @@
 *.app
 
 #visual studio
-*/.vs/
-**/Debug/
+**/.vs/*
+**/Debug/*
 
 #xcode
 .DS_Store
