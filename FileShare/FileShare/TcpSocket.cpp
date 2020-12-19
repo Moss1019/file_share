@@ -1,9 +1,48 @@
 
 #include "TcpSocket.h"
 
-#include <iostream>
+#include <errno.h>
+#include <fcntl.h>
 
-TcpSocket::TcpSocket(const SockAddress &addr)
+#include <chrono>
+
+#include <iostream>
+#include <memory>
+
+#include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
+
+void TcpSocket::listenCallback()
+{
+    while(m_isRunning)
+    {
+        std::cout << "Waiting\n";
+        sockaddr clientAddress;
+        memset(&clientAddress, 0, sizeof(sockaddr));
+        sockaddrLen clientAddrSize = sizeof(sockaddr);
+        int client = accept(m_sock, &clientAddress, &clientAddrSize);
+#ifdef _WIN32
+        
+#else
+        if(errno == EWOULDBLOCK)
+#endif
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+        else if(client > 0)
+        {
+            TcpConnection newClient(client, onReceive);
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            std::cout << "Some other shit\n";
+        }
+    }
+}
+
+TcpSocket::TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream))
+:onReceive(onReceive)
 {
     m_sock = socket(AF_INET, SOCK_STREAM, 0);
     if(m_sock < 0)
@@ -21,6 +60,18 @@ TcpSocket::TcpSocket(const SockAddress &addr)
 
 TcpSocket::~TcpSocket()
 {
+    stop();
+}
+
+void TcpSocket::stop()
+{
+    m_isRunning = false;
+    if(m_listenThread != nullptr)
+    {
+        m_listenThread->join();
+        delete m_listenThread;
+        m_listenThread = nullptr;
+    }
 #ifdef _WIN32
     closesocket(m_sock);
 #else
@@ -34,19 +85,7 @@ bool TcpSocket::start()
     {
         return false;
     }
-    while(m_isRunning)
-    {
-        sockaddr clientAddress;
-        memset(&clientAddress, 0, sizeof(sockaddr));
-        sockaddrLen clientAddrSize = sizeof(sockaddr);
-        int client = accept(m_sock, &clientAddress, &clientAddrSize);
-#ifdef _WIN32
-        closesocket(client);
-#else
-        close(client);
-#endif
-        m_isRunning = false;
-    }
+    m_listenThread = new std::thread(&TcpSocket::listenCallback, this);
     return true;
 }
 

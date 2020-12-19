@@ -26,6 +26,16 @@
 
 #include "TcpSocket.h"
 
+void onReceive(InputMemoryStream &stream)
+{
+    std::cout << stream.getRemainingSize() << std::endl;
+    char buffer[128];
+    int length = stream.getRemainingSize();
+    stream.read(buffer, length);
+    buffer[length] = '\0';
+    std::cout << std::string(buffer);
+}
+
 int main(int argc, const char * argv[])
 {
 #ifdef _WIN32
@@ -51,13 +61,12 @@ int main(int argc, const char * argv[])
         std::cout << socket.sendData(stream);
     }
 #else
-    SockAddress host("192.169.1.176", "mac", 8080);
-    TcpSocket socket(&host, receivedData);
-    socket.start();
+    SockAddress sockAddress("192.168.1.176", 8080);
+    TcpSocket sock(sockAddress, onReceive);
+    sock.start();
     int x;
     std::cin >> x;
-    socket.stop();
-    std::cout << "Done" << std::endl;
+    sock.stop();
 #endif
 
 #ifdef _WIN32
@@ -65,3 +74,13 @@ int main(int argc, const char * argv[])
 #endif
     return 0;
 }
+
+//ifdef _WIN32
+//   unsigned long mode = blocking ? 0 : 1;
+//   return (ioctlsocket(fd, FIONBIO, &mode) == 0) ? true : false;
+//#else
+//   int flags = fcntl(fd, F_GETFL, 0);
+//   if (flags == -1) return false;
+//   flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+//   return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;
+//#endi
