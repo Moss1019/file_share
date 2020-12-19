@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "SockAddress.h"
+#include "OutputMemoryStream.h"
 #include "InputMemoryStream.h"
 
 class TcpConnection
@@ -47,7 +48,12 @@ public:
 	bool inError() const;
 
 	const std::string &errorMsg() const;
+<<<<<<< HEAD
+
+	int sendData(OutputMemoryStream &stream);
+=======
     
     void stop();
+>>>>>>> 6983b19d79d1ae853a4b3c92c82e6885b62e75ec
 };
 
