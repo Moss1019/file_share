@@ -39,7 +39,7 @@ private:
     void (*onReceive)(InputMemoryStream &stream);
     
 public:
-    TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream));
+    TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client);
     
     ~TcpSocket();
     

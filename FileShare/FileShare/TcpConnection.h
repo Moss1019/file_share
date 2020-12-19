@@ -31,15 +31,15 @@ private:
     
     void receiveCallback();
     
-    void (*onReceive)(InputMemoryStream &stream);
+    void (*onReceive)(InputMemoryStream &stream, TcpConnection &client);
 
 public:
-	TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream));
+	TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
     
 #ifdef _WIN32
-    TcpConnection(SOCKET sock, void (*onReceive)(InputMemoryStream &stream));
+    TcpConnection(SOCKET sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
 #else
-    TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stream));
+    TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
 #endif
 
 	~TcpConnection();

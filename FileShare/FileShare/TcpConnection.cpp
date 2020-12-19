@@ -26,11 +26,11 @@ void TcpConnection::receiveCallback()
             }
         } while((bytesReceived > 0));
         InputMemoryStream inStream(outStream.getBufferPtr(), outStream.getLength());
-        onReceive(inStream);
+        onReceive(inStream, *this);
     }
 }
 
-TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream))
+TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client))
 :onReceive(onReceive)
 {
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -52,7 +52,7 @@ TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote,
 	m_isRunning = !m_inError;	
 }
 
-TcpConnection::TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stream))
+TcpConnection::TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client))
 :m_sock(sock), onReceive(onReceive)
 {
     m_isRunning = true;

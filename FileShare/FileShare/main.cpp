@@ -25,7 +25,7 @@
 
 #include "TcpSocket.h"
 
-void onReceive(InputMemoryStream &stream)
+void onReceive(InputMemoryStream &stream, TcpConnection &client)
 {
     std::cout << stream.getRemainingSize() << std::endl;
     char buffer[128];
@@ -57,7 +57,7 @@ int main(int argc, const char * argv[])
     }
     
 #else
-    SockAddress sockAddress("192.168.1.176", 8080);
+    SockAddress sockAddress("192.168.1.176", 8080); 
     TcpSocket sock(sockAddress, onReceive);
     sock.start();
     int x;
