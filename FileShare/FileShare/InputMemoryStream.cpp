@@ -3,14 +3,19 @@
 #include <memory>
 #include <cstring>
 
+#include <iostream>
+
 InputMemoryStream::InputMemoryStream(char *buffer, int byteCount)
-	:m_buffer(buffer), m_head(0), m_capacity(byteCount)
+	:m_head(0), m_capacity(byteCount)
 {
+    m_buffer = reinterpret_cast<char *>(std::malloc(byteCount));
+    std::memcpy(m_buffer, buffer, byteCount);
 }
 
 InputMemoryStream::InputMemoryStream(const char *buffer, int byteCount)
 	: m_head(0), m_capacity(byteCount)
 {
+    m_buffer = reinterpret_cast<char *>(std::malloc(byteCount));
 	std::memcpy(m_buffer, buffer, byteCount);
 }
 
