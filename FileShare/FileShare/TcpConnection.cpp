@@ -35,3 +35,8 @@ const std::string &TcpConnection::errorMsg() const
 {
 	return m_errorMsg;
 }
+
+int TcpConnection::sendData(OutputMemoryStream &stream)
+{
+	return send(m_sock, stream.getBufferPtr(), stream.getLength(), 0);
+}

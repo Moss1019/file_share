@@ -11,6 +11,7 @@
 #endif
 
 #include <fstream>
+#include <string>
 
 #include <vector>
 #include <cstring>
@@ -43,9 +44,12 @@ int main(int argc, const char * argv[])
     } 
     else
     {
-        std::cout << "FINE";
+        std::string input;
+        std::cin >> input;
+        OutputMemoryStream stream;
+        stream.write(input.c_str(), input.length());
+        std::cout << socket.sendData(stream);
     }
-    
 #else
     SockAddress host("192.169.1.176", "mac", 8080);
     TcpSocket socket(&host, receivedData);

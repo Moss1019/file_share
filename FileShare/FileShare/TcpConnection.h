@@ -9,6 +9,7 @@
 #include <string>
 
 #include "SockAddress.h"
+#include "OutputMemoryStream.h"
 
 class TcpConnection
 {
@@ -29,5 +30,7 @@ public:
 	bool inError() const;
 
 	const std::string &errorMsg() const;
+
+	int sendData(OutputMemoryStream &stream);
 };
 
