@@ -2,8 +2,14 @@
 
 #ifdef _WIN32
 #include <WinSock2.h>
+#ifndef socktype
+#define socktype SOCKET
+#endif
 #else
 #include <unistd.h>
+#ifndef socktype
+#define socktype int
+#endif
 #endif
 
 #include <string>
@@ -32,16 +38,12 @@ private:
     
     void receiveCallback();
     
-    void (*onReceive)(InputMemoryStream &stream, TcpConnection &client);
+    void (*onReceive)(InputMemoryStream &stream, TcpConnection *client);
 
 public:
-	TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
-    
-#ifdef _WIN32
-    TcpConnection(SOCKET sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
-#else
-    TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
-#endif
+	TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client));
+
+    TcpConnection(socktype sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client));
 
 	~TcpConnection();
 

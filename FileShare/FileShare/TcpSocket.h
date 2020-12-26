@@ -6,10 +6,17 @@
 
 #ifdef _WIN32
 #include <WinSock2.h>
+
+#ifndef socktype
+#define socktype SOCKET
+#endif
 #define sockaddrLen int
 #else
 #include <unistd.h>
 
+#ifndef socktype
+#define socktype SOCKET
+#endif
 #define sockaddrLen socklen_t
 #endif
 

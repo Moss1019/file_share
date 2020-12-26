@@ -11,7 +11,7 @@ void TcpConnection::receiveCallback()
         int bytesReceived = 0;
         int totalReceived = 0;
         OutputMemoryStream outStream;
-        void *buffer = std::malloc(512);
+        char *buffer = reinterpret_cast<char *>(std::malloc(512));
         do
         {
             bytesReceived = recv(m_sock, buffer, 512, 0);
@@ -26,11 +26,11 @@ void TcpConnection::receiveCallback()
             }
         } while((bytesReceived > 0));
         InputMemoryStream inStream(outStream.getBufferPtr(), outStream.getLength());
-        onReceive(inStream, *this);
+        onReceive(inStream, this);
     }
 }
 
-TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client))
+TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client))
 :onReceive(onReceive)
 {
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -52,8 +52,8 @@ TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote,
 	m_isRunning = !m_inError;	
 }
 
-TcpConnection::TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client))
-:m_sock(sock), onReceive(onReceive)
+TcpConnection::TcpConnection(socktype sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client))
+    :m_sock(sock), onReceive(onReceive)
 {
     m_isRunning = true;
     m_receiveThread = new std::thread(&TcpConnection::receiveCallback, this);
@@ -61,17 +61,18 @@ TcpConnection::TcpConnection(int sock, void (*onReceive)(InputMemoryStream &stre
 
 TcpConnection::~TcpConnection()
 {
+    m_isRunning = false;
+#ifdef _WIN32
+    closesocket(m_sock);
+#else
+    close(m_sock);
+#endif
     if(m_receiveThread != nullptr)
     {
         m_receiveThread->join();
         delete m_receiveThread;
         m_receiveThread = nullptr;
     }
-#ifdef _WIN32
-	closesocket(m_sock);
-#else
-    close(m_sock);
-#endif
 }
 
 bool TcpConnection::inError() const

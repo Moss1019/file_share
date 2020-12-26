@@ -20,23 +20,10 @@ void TcpSocket::listenCallback()
         sockaddr clientAddress;
         memset(&clientAddress, 0, sizeof(sockaddr));
         sockaddrLen clientAddrSize = sizeof(sockaddr);
-        int client = accept(m_sock, &clientAddress, &clientAddrSize);
-#ifdef _WIN32
-        
-#else
-        if(errno == EWOULDBLOCK)
-#endif
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-        else if(client > 0)
+        socktype client = accept(m_sock, &clientAddress, &clientAddrSize);
+        if (client > -1)
         {
             TcpConnection newClient(client, onReceive);
-        }
-        else
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            std::cout << "Some other shit\n";
         }
     }
 }
@@ -66,17 +53,17 @@ TcpSocket::~TcpSocket()
 void TcpSocket::stop()
 {
     m_isRunning = false;
+#ifdef _WIN32
+    closesocket(m_sock);
+#else
+    close(m_sock);
+#endif
     if(m_listenThread != nullptr)
     {
         m_listenThread->join();
         delete m_listenThread;
         m_listenThread = nullptr;
     }
-#ifdef _WIN32
-    closesocket(m_sock);
-#else
-    close(m_sock);
-#endif
 }
 
 bool TcpSocket::start()
