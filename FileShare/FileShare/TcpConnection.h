@@ -16,17 +16,13 @@
 #include <thread>
 
 #include "SockAddress.h"
-#include "OutputMemoryStream.h"
 #include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
 
 class TcpConnection
 {
 private:
-#ifdef _WIN32
-	SOCKET m_sock;
-#else
-    int m_sock;
-#endif
+    socktype m_sock;
 
 	bool m_inError = false;
 
@@ -42,7 +38,7 @@ private:
 
 public:
 	TcpConnection(const SockAddress &host, const SockAddress &remote, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client));
-
+    
     TcpConnection(socktype sock, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client));
 
 	~TcpConnection();

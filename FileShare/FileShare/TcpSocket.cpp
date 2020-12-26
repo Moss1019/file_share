@@ -28,7 +28,11 @@ void TcpSocket::listenCallback()
     }
 }
 
+<<<<<<< HEAD
 TcpSocket::TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client))
+=======
+TcpSocket::TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client))
+>>>>>>> c6bd73251213e19b35f8850cdd98d8a670527fe8
 :onReceive(onReceive)
 {
     m_sock = socket(AF_INET, SOCK_STREAM, 0);
