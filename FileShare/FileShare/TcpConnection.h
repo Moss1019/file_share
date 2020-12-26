@@ -2,19 +2,14 @@
 
 #ifdef _WIN32
 #include <WinSock2.h>
-#ifndef socktype
-#define socktype SOCKET
-#endif
 #else
 #include <unistd.h>
-#ifndef socktype
-#define socktype int
-#endif
 #endif
 
 #include <string>
 #include <thread>
 
+#include "Types.h"
 #include "SockAddress.h"
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"

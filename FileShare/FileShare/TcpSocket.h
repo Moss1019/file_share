@@ -7,29 +7,24 @@
 #ifdef _WIN32
 #include <WinSock2.h>
 
-#ifndef socktype
-#define socktype SOCKET
-#endif
 #define sockaddrLen int
 #else
 #include <unistd.h>
 
-#ifndef socktype
-#define socktype SOCKET
-#endif
 #define sockaddrLen socklen_t
 #endif
 
 #include <thread>
 #include <vector>
 
+#include "Types.h"
 #include "SockAddress.h"
 #include "TcpConnection.h"
 
 class TcpSocket
 {
 private:
-    int m_sock;
+    socktype m_sock;
     
     bool m_isRunning = false;
     
