@@ -155,6 +155,7 @@
     <ClInclude Include="SockAddress.h" />
     <ClInclude Include="TcpConnection.h" />
     <ClInclude Include="TcpSocket.h" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="UpdSocket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
