@@ -34,6 +34,9 @@ void onReceive(InputMemoryStream &stream, TcpConnection &client)
     stream.read(buffer, length);
     buffer[length] = '\0';
     std::cout << std::string(buffer);
+    OutputMemoryStream outStream;
+    outStream.write(200);
+    client.sendData(outStream);
 }
 
 int main(int argc, const char * argv[])

@@ -36,10 +36,10 @@ private:
     
     void listenCallback();
     
-    void (*onReceive)(InputMemoryStream &stream);
+    void (*onReceive)(InputMemoryStream &stream, TcpConnection &client);
     
 public:
-    TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client);
+    TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection &client));
     
     ~TcpSocket();
     
