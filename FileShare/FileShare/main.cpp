@@ -26,7 +26,7 @@
 
 #include "TcpSocket.h"
 
-void onReceive(InputMemoryStream &stream)
+void onReceive(InputMemoryStream &stream, TcpConnection *client)
 {
     std::cout << stream.getRemainingSize() << std::endl;
     char buffer[128];
@@ -47,7 +47,7 @@ int main(int argc, const char * argv[])
     
     SockAddress host("192.168.1.100", 8080);
     SockAddress remote("192.168.1.176", 8080);
-    TcpConnection socket(host, remote);
+    TcpConnection socket(host, remote, onReceive);
     if (socket.inError())
     {
         std::cout << "IN error " << socket.errorMsg();
