@@ -1,79 +1,66 @@
 
 #include "TcpSocket.h"
 
-#include <errno.h>
-#include <fcntl.h>
 
-#include <chrono>
-
-#include <iostream>
-#include <memory>
-
-#include "InputMemoryStream.h"
-#include "OutputMemoryStream.h"
-
-void TcpSocket::listenCallback()
+void TcpSocket::onReceive()
 {
-    while(m_isRunning)
+    char *buffer = reinterpret_cast<char *>(std::malloc(512));
+    OutputMemoryStream stream;
+    while (m_isRunning)
     {
-        std::cout << "Waiting\n";
-        sockaddr clientAddress;
-        memset(&clientAddress, 0, sizeof(sockaddr));
-        sockaddrLen clientAddrSize = sizeof(sockaddr);
-        socktype client = accept(m_sock, &clientAddress, &clientAddrSize);
-        if (client > -1)
+        bool isReceiving = true;
+        while (isReceiving)
         {
-            TcpConnection newClient(client, onReceive);
+            int bytesRead = recv(m_sock, buffer, 512, 0);
+            if (bytesRead == 0)
+            {
+                isReceiving = false;
+                InputMemoryStream inputStream(stream.getBufferPtr(), stream.getLength());
+                receiveCallback(inputStream, this);
+            }
+            else if (bytesRead == -1)
+            {
+                isReceiving = false;
+                m_isRunning = false;
+            }
+            else
+            {
+                stream.write(buffer, bytesRead);
+            }
         }
     }
+    std::free(buffer);
 }
 
-TcpSocket::TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client))
-    :onReceive(onReceive)
+TcpSocket::TcpSocket(const SockAddress &remote, void(*receiveCallback)(InputMemoryStream &stream, TcpSocket *client))
+    :receiveCallback(receiveCallback)
 {
-    m_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if(m_sock < 0)
+    m_sock = socket(PF_INET, SOCK_STREAM, 0);
+    if (connect(m_sock, remote.constAddress(), remote.addressLen()) < 0)
     {
         m_inError = true;
-        m_errorMsg = "Socket creation failed";
+        m_errorMsg = "Could not connect to remote host";
     }
-    if(bind(m_sock, addr.constAddress(), addr.addressLen()) < 0)
-    {
-        m_inError = true;
-        m_errorMsg = "Socket binding failed";
-    }
+    m_receiveThread = new std::thread(&TcpSocket::onReceive, this);
     m_isRunning = !m_inError;
+}
+
+TcpSocket::TcpSocket(socktype sock, void(*receiveCallback)(InputMemoryStream &stream, TcpSocket *client))
+    :m_sock(sock), receiveCallback(receiveCallback)
+{
+    m_isRunning = true;
 }
 
 TcpSocket::~TcpSocket()
 {
-    stop();
-}
-
-void TcpSocket::stop()
-{
-    m_isRunning = false;
-#ifdef _WIN32
+    shutdown(m_sock, SD_BOTH);
     closesocket(m_sock);
-#else
-    close(m_sock);
-#endif
-    if(m_listenThread != nullptr)
+    if (m_receiveThread != nullptr)
     {
-        m_listenThread->join();
-        delete m_listenThread;
-        m_listenThread = nullptr;
+        m_receiveThread->join();
+        delete m_receiveThread;
+        m_receiveThread = nullptr;
     }
-}
-
-bool TcpSocket::start()
-{
-    if(listen(m_sock, 2) < 0)
-    {
-        return false;
-    }
-    m_listenThread = new std::thread(&TcpSocket::listenCallback, this);
-    return true;
 }
 
 bool TcpSocket::inError() const
@@ -84,4 +71,11 @@ bool TcpSocket::inError() const
 const std::string &TcpSocket::errorMsg() const
 {
     return m_errorMsg;
+}
+
+int TcpSocket::sendData(const OutputMemoryStream &stream)
+{
+    char buffer[] = "hello";
+    int bytesSent = send(m_sock, buffer, 6, 0);
+    return bytesSent;
 }

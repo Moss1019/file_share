@@ -1,25 +1,19 @@
-
 #pragma once
 
 
-#include <string>
-
 #ifdef _WIN32
 #include <WinSock2.h>
-
-#define sockaddrLen int
 #else
 #include <unistd.h>
-
-#define sockaddrLen socklen_t
 #endif
 
+#include <string>
 #include <thread>
-#include <vector>
 
 #include "Types.h"
 #include "SockAddress.h"
-#include "TcpConnection.h"
+#include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
 
 class TcpSocket
 {
@@ -30,26 +24,24 @@ private:
     
     bool m_inError = false;
     
-    std::thread *m_listenThread = nullptr;
-    
     std::string m_errorMsg;
-    
-    std::vector<TcpConnection> m_connections;
-    
-    void listenCallback();
-    
-    void (*onReceive)(InputMemoryStream &stream, TcpConnection *client);
+
+    std::thread *m_receiveThread = nullptr;
+
+    void (*receiveCallback)(InputMemoryStream &, TcpSocket *);
+
+    void onReceive();
     
 public:
-    TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client));
+    TcpSocket(const SockAddress &remote, void (*receiveCallback)(InputMemoryStream &stream, TcpSocket *client));
+
+    TcpSocket(socktype sock, void(*receiveCallback)(InputMemoryStream &stream, TcpSocket *client));
     
     ~TcpSocket();
-    
-    void stop();
-    
-    bool start();
     
     bool inError() const;
     
     const std::string &errorMsg() const;
+
+    int sendData(const OutputMemoryStream &stream);
 };

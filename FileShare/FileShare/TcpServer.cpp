@@ -52,6 +52,7 @@ TcpServer::TcpServer(const SockAddress &host)
         m_inError = true;
         m_errorMsg = "Could not listen on socket";
     }
+    m_isRunning = !m_inError;
 }
 
 TcpServer::~TcpServer()

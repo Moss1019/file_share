@@ -20,14 +20,13 @@
 #include "Message.h"
 #include "UpdSocket.h"
 #include "SockAddress.h"
-#include "TcpConnection.h"
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
 #include "TcpSocket.h"
 #include "TcpServer.h"
 
-void onReceive(InputMemoryStream &stream, TcpConnection *client)
+void onReceive(InputMemoryStream &stream, TcpSocket *client)
 {
     std::cout << "Got a msg" << std::endl;
     std::cout << stream.getRemainingSize() << std::endl;
@@ -50,9 +49,8 @@ int main(int argc, const char * argv[])
 
 #ifdef _WIN32
     
-    SockAddress host("192.168.1.100", 8080);
     SockAddress remote("192.168.1.176", 8080);
-    TcpConnection socket(host, remote, onReceive);
+    TcpSocket socket(remote, onReceive);
     if (socket.inError())
     {
         std::cout << "IN error " << socket.errorMsg();
@@ -69,6 +67,8 @@ int main(int argc, const char * argv[])
         }
         std::cout << socket.sendData(stream);
     }
+    int x;
+    std::cin >> x;
 #else
     SockAddress sockAddress("192.168.1.176", 8080); 
     TcpServer server(sockAddress);

@@ -8,3 +8,13 @@
 #endif
 
 #endif
+
+#ifndef sockaddrLen
+
+#ifdef _WIN32
+#define sockaddrLen int
+#else
+#define sockaddrLen socklen_t
+#endif
+
+#endif
