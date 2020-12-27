@@ -25,13 +25,11 @@
 #include "OutputMemoryStream.h"
 
 #include "TcpSocket.h"
+#include "TcpServer.h"
 
-<<<<<<< HEAD
-void onReceive(InputMemoryStream &stream, TcpConnection &client)
-=======
 void onReceive(InputMemoryStream &stream, TcpConnection *client)
->>>>>>> c6bd73251213e19b35f8850cdd98d8a670527fe8
 {
+    std::cout << "Got a msg" << std::endl;
     std::cout << stream.getRemainingSize() << std::endl;
     char buffer[128];
     int length = stream.getRemainingSize();
@@ -40,7 +38,7 @@ void onReceive(InputMemoryStream &stream, TcpConnection *client)
     std::cout << std::string(buffer);
     OutputMemoryStream outStream;
     outStream.write(200);
-    client.sendData(outStream);
+    client->sendData(outStream);
 }
 
 int main(int argc, const char * argv[])
@@ -69,11 +67,16 @@ int main(int argc, const char * argv[])
     }
 #else
     SockAddress sockAddress("192.168.1.176", 8080); 
-    TcpSocket sock(sockAddress, onReceive);
-    sock.start();
+    TcpServer server(sockAddress);
+    server.start();
+    if(server.inError())
+    {
+        std::cout << server.errorMsg() << std::endl;
+    }
     int x;
     std::cin >> x;
-    sock.stop();
+    server.stop();
+    std::cout << "Done..." << std::endl;
 #endif
 
 #ifdef _WIN32
