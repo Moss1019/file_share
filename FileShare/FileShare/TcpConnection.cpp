@@ -39,11 +39,6 @@ TcpConnection::TcpConnection(const SockAddress &host, const SockAddress &remote,
 		m_inError = true;
 		m_errorMsg = "Socket creation failed";
 	}
-	if (bind(m_sock, host.constAddress(), host.addressLen()) < 0)
-	{
-		m_inError = true;
-		m_errorMsg = "Socket binding failed";
-	}
 	if (connect(m_sock, remote.constAddress(), remote.addressLen()) < 0)
 	{
 		m_inError = true;

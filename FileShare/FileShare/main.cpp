@@ -58,6 +58,10 @@ int main(int argc, const char * argv[])
         std::cin >> input;
         OutputMemoryStream stream;
         stream.write(input.c_str(), input.length());
+        if (socket.inError())
+        {
+            std::cout << "IN error " << socket.errorMsg();
+        }
         std::cout << socket.sendData(stream);
     }
 #else
