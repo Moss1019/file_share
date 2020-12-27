@@ -12,19 +12,13 @@ void TcpConnection::receiveCallback()
         int totalReceived = 0;
         OutputMemoryStream outStream;
         char *buffer = reinterpret_cast<char *>(std::malloc(512));
-        do
+        bytesReceived = recv(m_sock, buffer, 512, 0);
+        std::cout << "Received data " << bytesReceived << std::endl;
+        if (bytesReceived > 0)
         {
-            bytesReceived = recv(m_sock, buffer, 512, 0);
-            if (bytesReceived > 0)
-            {
-                outStream.write(buffer, bytesReceived);
-                totalReceived += bytesReceived;
-            }
-            else if (bytesReceived == -1)
-            {
-                m_isRunning = false;
-            }
-        } while((bytesReceived > 0));
+            outStream.write(buffer, bytesReceived);
+            totalReceived += bytesReceived;
+        }
         InputMemoryStream inStream(outStream.getBufferPtr(), outStream.getLength());
         onReceive(inStream, this);
     }

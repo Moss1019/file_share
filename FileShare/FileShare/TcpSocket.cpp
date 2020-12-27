@@ -29,7 +29,7 @@ void TcpSocket::listenCallback()
 }
 
 TcpSocket::TcpSocket(const SockAddress &addr, void (*onReceive)(InputMemoryStream &stream, TcpConnection *client))
-:onReceive(onReceive)
+    :onReceive(onReceive)
 {
     m_sock = socket(AF_INET, SOCK_STREAM, 0);
     if(m_sock < 0)
