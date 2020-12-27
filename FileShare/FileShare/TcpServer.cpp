@@ -1,14 +1,17 @@
 
 #include "TcpServer.h"
 
+#ifdef _WIN32
+
+#else
 #include <unistd.h>
+#endif
 
 #include <memory>
 
 void TcpServer::acceptCallback()
 {
-    bool isRunning = true;
-    while(isRunning)
+    while(m_isRunning)
     {
         sockaddr client;
         memset(&client, 0, sizeof(sockaddr));
@@ -20,13 +23,18 @@ void TcpServer::acceptCallback()
             int received = recv(clientSock, buffer, 512, 0);
             buffer[received] = '\0';
             send(clientSock, buffer, received, 0);
+#ifdef _WIN32
+            shutdown(clientSock, SD_BOTH);
+            closesocket(clientSock);
+#else
             shutdown(clientSock, SHUT_RDWR);
             close(clientSock);
+#endif
             std::free(buffer);
         }
         else
         {
-            isRunning = false;
+            m_isRunning = false;
         }
     }
 }
@@ -68,8 +76,13 @@ void TcpServer::start()
 
 void TcpServer::stop()
 {
+#ifdef _WIN32
+    shutdown(m_sock, SD_BOTH);
+    closesocket(m_sock);
+#else
     shutdown(m_sock, SHUT_RDWR);
     close(m_sock);
+#endif
     if(m_acceptThread != nullptr)
     {
         m_acceptThread->join();

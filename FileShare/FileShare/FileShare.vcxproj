@@ -145,6 +145,7 @@
     <ClCompile Include="OutputMemoryStream.cpp" />
     <ClCompile Include="SockAddress.cpp" />
     <ClCompile Include="TcpConnection.cpp" />
+    <ClCompile Include="TcpServer.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
     <ClCompile Include="UpdSocket.cpp" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClInclude Include="OutputMemoryStream.h" />
     <ClInclude Include="SockAddress.h" />
     <ClInclude Include="TcpConnection.h" />
+    <ClInclude Include="TcpServer.h" />
     <ClInclude Include="TcpSocket.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="UpdSocket.h" />
