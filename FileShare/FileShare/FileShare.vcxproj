@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddressServer.cpp" />
     <ClCompile Include="InputMemoryStream.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OutputMemoryStream.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="UpdSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddressServer.h" />
     <ClInclude Include="InputMemoryStream.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="OutputMemoryStream.h" />

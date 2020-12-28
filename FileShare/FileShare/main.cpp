@@ -5,9 +5,9 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #else
+#include <memory>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <memory>
 #endif
 
 #include <fstream>
@@ -23,22 +23,8 @@
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
-#include "TcpSocket.h"
 #include "TcpServer.h"
-
-void onReceive(InputMemoryStream &stream, TcpSocket *client)
-{
-    std::cout << "Got a msg" << std::endl;
-    std::cout << stream.getRemainingSize() << std::endl;
-    char buffer[128];
-    int length = stream.getRemainingSize();
-    stream.read(buffer, length);
-    buffer[length] = '\0';
-    std::cout << std::string(buffer);
-    OutputMemoryStream outStream;
-    outStream.write(200);
-    client->sendData(outStream);
-}
+#include "TcpSocket.h"
 
 int main(int argc, const char * argv[])
 {
@@ -48,27 +34,34 @@ int main(int argc, const char * argv[])
 #endif
 
 #ifdef _WIN32
-    
     SockAddress remote("192.168.1.176", 8080);
-    TcpSocket socket(remote, onReceive);
+    TcpSocket socket(remote);
     if (socket.inError())
     {
         std::cout << "IN error " << socket.errorMsg();
     } 
     else
     {
-        std::string input;
-        std::cin >> input;
         OutputMemoryStream stream;
-        stream.write(input.c_str(), input.length());
-        if (socket.inError())
+        std::ifstream input("C:/Users/mosso/Desktop/Books/Assembly/Assembly Language for x86 Processors, 7th Edition.pdf", std::ifstream::in | std::ifstream::binary);
+        char c;
+        /*while (true)
         {
-            std::cout << "IN error " << socket.errorMsg();
-        }
-        std::cout << socket.sendData(stream);
+            input.get(c);
+            stream.write(&c, sizeof(char));
+            if (input.eof())
+            {
+                std::cout << "end of file " << c << " " << stream.getLength();
+                break;
+            }
+        }*/
+        //std::cout << std::endl << socket.sendData(stream);
+        OutputMemoryStream stream2;
+        int received = socket.receiveData(stream2);
+        std::cout << "Received " << received << " bytes" << std::endl;
+        int x;
+        std::cin >> x;
     }
-    int x;
-    std::cin >> x;
 #else
     SockAddress sockAddress("192.168.1.176", 8080); 
     TcpServer server(sockAddress);

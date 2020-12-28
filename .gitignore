@@ -38,3 +38,5 @@
 #xcode
 .DS_Store
 **/FileShare.xcodeproj
+
+**.test

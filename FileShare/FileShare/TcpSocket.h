@@ -26,16 +26,10 @@ private:
     
     std::string m_errorMsg;
 
-    std::thread *m_receiveThread = nullptr;
-
-    void (*receiveCallback)(InputMemoryStream &, TcpSocket *);
-
-    void onReceive();
-    
 public:
-    TcpSocket(const SockAddress &remote, void (*receiveCallback)(InputMemoryStream &stream, TcpSocket *client));
+    TcpSocket(const SockAddress &remote);
 
-    TcpSocket(socktype sock, void(*receiveCallback)(InputMemoryStream &stream, TcpSocket *client));
+    TcpSocket(socktype sock);
     
     ~TcpSocket();
     
@@ -44,4 +38,6 @@ public:
     const std::string &errorMsg() const;
 
     int sendData(const OutputMemoryStream &stream);
+
+    int receiveData(OutputMemoryStream &stream);
 };
