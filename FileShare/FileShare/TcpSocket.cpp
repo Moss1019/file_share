@@ -20,8 +20,13 @@ TcpSocket::TcpSocket(socktype sock)
 
 TcpSocket::~TcpSocket()
 {
+#ifdef _WIN32
     shutdown(m_sock, SD_BOTH);
     closesocket(m_sock);
+#else
+    shutdown(m_sock, SHUT_RDWR);
+    close(m_sock);
+#endif
 }
 
 bool TcpSocket::inError() const
