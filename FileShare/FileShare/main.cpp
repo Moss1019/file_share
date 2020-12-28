@@ -39,6 +39,11 @@ struct Event
     unsigned dataSize = 0;
 
     void *data = nullptr;
+    
+    Event()
+    {
+        
+    }
 
     Event(EventType type)
     {
@@ -77,6 +82,7 @@ struct Event
         stream.read(dataSize);
         if(dataSize > 0)
         {
+            data = std::malloc(dataSize);
             stream.read(data, dataSize);
         }
     }
@@ -114,6 +120,14 @@ int main(int argc, const char * argv[])
     udpSock.receiveFrom(outStream, &remote);
     SockAddress remoteHost(remote);
     std::cout << remoteHost.ipAddress() << std::endl;
+    InputMemoryStream inStream(outStream.getBufferPtr(), outStream.getLength());
+    Event event;
+    event.deserialize(inStream);
+    std::cout << event.dataSize << std::endl;
+    if(event.type == EventType::CONNECTED)
+    {
+        std::cout << std::string(reinterpret_cast<char *>(event.data)) << std::endl;
+    }
 #endif
 
 #ifdef _WIN32
