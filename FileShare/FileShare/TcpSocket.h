@@ -20,8 +20,6 @@ class TcpSocket
 private:
     socktype m_sock;
     
-    bool m_isRunning = false;
-    
     bool m_inError = false;
     
     std::string m_errorMsg;

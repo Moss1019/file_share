@@ -26,6 +26,52 @@
 #include "TcpServer.h"
 #include "TcpSocket.h"
 
+enum class EventType
+{
+    CONNECTED,
+    DISCONNECTED
+};
+
+struct Event
+{
+    EventType type;
+
+    unsigned dataSize = 0;
+
+    void *data = nullptr;
+
+    Event(EventType type)
+    {
+        this->type = type;
+    }
+
+    Event(EventType type, unsigned dataSize, void *data)
+    {
+        this->type = type;
+        this->dataSize = dataSize;
+        this->data = data;
+    }
+
+    ~Event()
+    {
+        if (data != nullptr)
+        {
+            std::free(data);
+            data = nullptr;
+        }
+    }
+
+    void serialize(OutputMemoryStream &stream)
+    {
+        stream.write(&type, sizeof(Event));
+        if (data != nullptr)
+        {
+            stream.write(dataSize);
+            stream.write(data, dataSize);
+        }
+    }
+};
+
 int main(int argc, const char * argv[])
 {
 #ifdef _WIN32
@@ -34,46 +80,29 @@ int main(int argc, const char * argv[])
 #endif
 
 #ifdef _WIN32
-    SockAddress remote("192.168.1.176", 8080);
-    TcpSocket socket(remote);
-    if (socket.inError())
-    {
-        std::cout << "IN error " << socket.errorMsg();
-    } 
-    else
-    {
-        OutputMemoryStream stream;
-        std::ifstream input("C:/Users/mosso/Desktop/Books/Assembly/Assembly Language for x86 Processors, 7th Edition.pdf", std::ifstream::in | std::ifstream::binary);
-        char c;
-        /*while (true)
-        {
-            input.get(c);
-            stream.write(&c, sizeof(char));
-            if (input.eof())
-            {
-                std::cout << "end of file " << c << " " << stream.getLength();
-                break;
-            }
-        }*/
-        //std::cout << std::endl << socket.sendData(stream);
-        OutputMemoryStream stream2;
-        int received = socket.receiveData(stream2);
-        std::cout << "Received " << received << " bytes" << std::endl;
-        int x;
-        std::cin >> x;
-    }
+    std::string ipAddress = "192.168.1.100";
+    SockAddress host(ipAddress, 8081);
+
+    UdpSocket updSock(host);
+
+    std::string hostName = "windows";
+    void *buffer = std::malloc(hostName.length());
+    memcpy(buffer, hostName.c_str(), hostName.length());
+    Event connectEvent(EventType::CONNECTED, hostName.length(), buffer);
+    OutputMemoryStream stream;
+    connectEvent.serialize(stream);
+
+    SockAddress addressHost("192.168.1.176", 8081);
+    updSock.sendTo(stream, addressHost);
+
 #else
-    SockAddress sockAddress("192.168.1.176", 8080); 
-    TcpServer server(sockAddress);
-    server.start();
-    if(server.inError())
-    {
-        std::cout << server.errorMsg() << std::endl;
-    }
-    int x;
-    std::cin >> x;
-    server.stop();
-    std::cout << "Done..." << std::endl;
+    SockAddress host("192.168.1.176", 8081); 
+    UdpSocket udpSock(host);
+    OutputMemoryStream outStream;
+    SockAddress *remoteHost = nullptr;
+    udpSock.receiveFrom(outStream, &(*remoteHost));
+    std::cout << remoteHost.ipAddress() << std::endl;
+    delete remoteHost;
 #endif
 
 #ifdef _WIN32

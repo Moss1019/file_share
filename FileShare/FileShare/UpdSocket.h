@@ -15,6 +15,8 @@ typedef unsigned sock_addr_size;
 #include <string>
 
 #include "SockAddress.h"
+#include "InputMemoryStream.h"
+#include "OutputMemoryStream.h"
 
 class UdpSocket
 {
@@ -34,11 +36,11 @@ public:
 
 	const std::string &errorMsg() const;
 
-	int sendTo(const char *data, unsigned dataSize, const SockAddress &destination);
+	int sendTo(OutputMemoryStream &stream, const SockAddress &destination);
 
-	int receiveFrom(char *data, unsigned maxSize, SockAddress **remote);
+	int receiveFrom(OutputMemoryStream &stream, SockAddress **remote);
 
-	int receiveFrom(char *data, unsigned maxSize);
+	int receiveFrom(OutputMemoryStream &stream);
 
 	bool closeSocket();
 

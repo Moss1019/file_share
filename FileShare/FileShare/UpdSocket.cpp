@@ -35,13 +35,13 @@ const std::string &UdpSocket::errorMsg() const
 	return m_errorMsg;
 }
 
-int UdpSocket::sendTo(const char *data, unsigned dataSize, const SockAddress &destination)
+int UdpSocket::sendTo(OutputMemoryStream &stream, const SockAddress &destination)
 {
 	if (m_inError)
 	{
 		return -1;
 	}
-	int bytesSent = sendto(m_sock, data, dataSize, 0, destination.constAddress(), destination.addressLen());
+	int bytesSent = sendto(m_sock, stream.getBufferPtr(), stream.getLength(), 0, destination.constAddress(), destination.addressLen());
 	if (bytesSent < 0)
 	{
 		m_inError = true;
@@ -50,7 +50,7 @@ int UdpSocket::sendTo(const char *data, unsigned dataSize, const SockAddress &de
 	return bytesSent;
 }
 
-int UdpSocket::receiveFrom(char *data, unsigned maxSize, SockAddress **remote)
+int UdpSocket::receiveFrom(OutputMemoryStream &stream, SockAddress **remote)
 {
 	if (m_inError)
 	{
@@ -58,17 +58,20 @@ int UdpSocket::receiveFrom(char *data, unsigned maxSize, SockAddress **remote)
 	}
 	sockaddr remoteHost;
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
-	int bytesReceived = recvfrom(m_sock, data, maxSize, 0, &remoteHost, &remoteHostSize);
+	char *buffer = reinterpret_cast<char *>(std::malloc(512));
+	int bytesReceived = recvfrom(m_sock, buffer, 512, 0, &remoteHost, &remoteHostSize);
 	*remote = new SockAddress(remoteHost);
 	if (bytesReceived < 0)
 	{
 		m_inError = true;
 		m_errorMsg = "Could not receive data";
 	}
+	stream.write(buffer, bytesReceived);
+	std::free(buffer);
 	return bytesReceived;
 }
 
-int UdpSocket::receiveFrom(char *data, unsigned maxSize)
+int UdpSocket::receiveFrom(OutputMemoryStream &stream)
 {
 	if (m_inError)
 	{
@@ -76,13 +79,14 @@ int UdpSocket::receiveFrom(char *data, unsigned maxSize)
 	}
 	sockaddr remoteHost;
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
-	int bytesReceived = recvfrom(m_sock, data, maxSize, 0, &remoteHost, &remoteHostSize);
-	SockAddress sa(remoteHost);
+	char *buffer = reinterpret_cast<char *>(std::malloc(512));
+	int bytesReceived = recvfrom(m_sock, buffer, 512, 0, &remoteHost, &remoteHostSize);
 	if (bytesReceived < 0)
 	{
 		m_inError = true;
 		m_errorMsg = "Could not receive data";
 	}
+	std::free(buffer);
 	return bytesReceived;
 }
 

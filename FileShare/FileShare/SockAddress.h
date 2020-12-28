@@ -23,4 +23,6 @@ public:
     const sockaddr *constAddress() const;
     
     unsigned addressLen() const;
+
+    const std::string &ipAddress();
 };

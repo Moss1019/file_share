@@ -9,13 +9,11 @@ TcpSocket::TcpSocket(const SockAddress &remote)
         m_inError = true;
         m_errorMsg = "Could not connect to remote host";
     }
-    m_isRunning = !m_inError;
 }
 
 TcpSocket::TcpSocket(socktype sock)
     :m_sock(sock)
 {
-    m_isRunning = true;
 }
 
 TcpSocket::~TcpSocket()
