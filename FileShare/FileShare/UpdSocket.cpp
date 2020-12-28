@@ -50,17 +50,15 @@ int UdpSocket::sendTo(OutputMemoryStream &stream, const SockAddress &destination
 	return bytesSent;
 }
 
-int UdpSocket::receiveFrom(OutputMemoryStream &stream, SockAddress **remote)
+int UdpSocket::receiveFrom(OutputMemoryStream &stream, sockaddr *remote)
 {
 	if (m_inError)
 	{
 		return -1;
 	}
-	sockaddr remoteHost;
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
 	char *buffer = reinterpret_cast<char *>(std::malloc(512));
-	int bytesReceived = recvfrom(m_sock, buffer, 512, 0, &remoteHost, &remoteHostSize);
-	*remote = new SockAddress(remoteHost);
+	int bytesReceived = recvfrom(m_sock, buffer, 512, 0, remote, &remoteHostSize);
 	if (bytesReceived < 0)
 	{
 		m_inError = true;

@@ -63,11 +63,21 @@ struct Event
 
     void serialize(OutputMemoryStream &stream)
     {
-        stream.write(&type, sizeof(Event));
+        stream.write(&type, sizeof(EventType));
+        stream.write(dataSize);
         if (data != nullptr)
         {
-            stream.write(dataSize);
             stream.write(data, dataSize);
+        }
+    }
+    
+    void deserialize(InputMemoryStream &stream)
+    {
+        stream.read(&type, sizeof(EventType));
+        stream.read(dataSize);
+        if(dataSize > 0)
+        {
+            stream.read(data, dataSize);
         }
     }
 };
@@ -100,10 +110,10 @@ int main(int argc, const char * argv[])
     SockAddress host("192.168.1.176", 8081); 
     UdpSocket udpSock(host);
     OutputMemoryStream outStream;
-    SockAddress *remoteHost = nullptr;
-    udpSock.receiveFrom(outStream, &(*remoteHost));
+    sockaddr remote;
+    udpSock.receiveFrom(outStream, &remote);
+    SockAddress remoteHost(remote);
     std::cout << remoteHost.ipAddress() << std::endl;
-    delete remoteHost;
 #endif
 
 #ifdef _WIN32

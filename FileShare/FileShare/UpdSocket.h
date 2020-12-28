@@ -38,7 +38,7 @@ public:
 
 	int sendTo(OutputMemoryStream &stream, const SockAddress &destination);
 
-	int receiveFrom(OutputMemoryStream &stream, SockAddress **remote);
+	int receiveFrom(OutputMemoryStream &stream, sockaddr *remote);
 
 	int receiveFrom(OutputMemoryStream &stream);
 
