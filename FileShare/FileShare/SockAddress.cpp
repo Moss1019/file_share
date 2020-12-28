@@ -34,10 +34,9 @@ unsigned SockAddress::addressLen() const
     return sizeof(sockaddr);
 }
 
-const std::string &SockAddress::ipAddress()
+const std::string SockAddress::ipAddress()
 {
     char buffer[16];
-    int len = inet_pton(AF_INET, buffer, &(reinterpret_cast<sockaddr_in *>(&m_addr)->sin_addr));
-    buffer[len] = '\0';
+    inet_ntop(AF_INET, &(reinterpret_cast<sockaddr_in *>(&m_addr)->sin_addr), buffer, 16);
     return std::string(buffer);
 }

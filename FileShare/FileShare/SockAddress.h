@@ -24,5 +24,5 @@ public:
     
     unsigned addressLen() const;
 
-    const std::string &ipAddress();
+    const std::string ipAddress();
 };

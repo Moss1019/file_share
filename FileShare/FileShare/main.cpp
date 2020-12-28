@@ -82,6 +82,7 @@ int main(int argc, const char * argv[])
 #ifdef _WIN32
     std::string ipAddress = "192.168.1.100";
     SockAddress host(ipAddress, 8081);
+    std::cout << host.ipAddress() << std::endl;
 
     UdpSocket updSock(host);
 
