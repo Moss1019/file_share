@@ -47,12 +47,11 @@ int main(int argc, const char * argv[])
 #else
     std::string ipAddress = "192.168.1.176";
     SockAddress host(ipAddress, 8081);
-    std::cout << host.ipAddress() << std::endl;
 
     UdpSocket updSock(host);
     SockAddress addressHost("192.168.1.100", 8081);
 
-    std::string hostName = "windows";
+    std::string hostName = "mac";
     void *buffer = std::malloc(hostName.length());
     memcpy(buffer, hostName.c_str(), hostName.length());
 
@@ -72,9 +71,11 @@ int main(int argc, const char * argv[])
     OutputMemoryStream stream3;
     e3.write(stream3);
 
-    updSock.sendTo(stream3, addressHost);
+    std::cout << updSock.sendTo(stream3, addressHost) << " sent\n";
 
     std::free(buffer);
+    
+    std::cout << "Done" << std::endl;
 #endif
 
 #ifdef _WIN32
