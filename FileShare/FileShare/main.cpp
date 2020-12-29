@@ -102,16 +102,31 @@ int main(int argc, const char * argv[])
     std::cout << host.ipAddress() << std::endl;
 
     UdpSocket updSock(host);
+    SockAddress addressHost("192.168.1.176", 8081);
 
     std::string hostName = "windows";
     void *buffer = std::malloc(hostName.length());
     memcpy(buffer, hostName.c_str(), hostName.length());
-    AddressEvent e(AddressEventType::CONNECTED, hostName.length(), buffer);
-    OutputMemoryStream stream;
-    e.write(stream);
 
-    SockAddress addressHost("192.168.1.176", 8081);
-    updSock.sendTo(stream, addressHost);
+    AddressEvent e1(AddressEventType::CONNECTED, hostName.length(), buffer);
+    OutputMemoryStream stream1;
+    e1.write(stream1);
+
+    updSock.sendTo(stream1, addressHost);
+
+    AddressEvent e2(AddressEventType::DISCONNECTED, hostName.length(), buffer);
+    OutputMemoryStream stream2;
+    e2.write(stream2);
+
+    updSock.sendTo(stream2, addressHost);
+
+    AddressEvent e3(AddressEventType::DEFAULT, hostName.length(), buffer);
+    OutputMemoryStream stream3;
+    e3.write(stream3);
+
+    updSock.sendTo(stream3, addressHost);
+
+    std::free(buffer);
 
 #else
 //    SockAddress host("192.168.1.176", 8081);
