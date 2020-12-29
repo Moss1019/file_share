@@ -15,10 +15,15 @@ class SockAddress
 {
 private:
     sockaddr m_addr;
+    
 public:
+    SockAddress(){}
+    
     SockAddress(const std::string &ipAddress, unsigned short port);
 
     SockAddress(const sockaddr &remote);
+    
+    SockAddress(const SockAddress &other);
     
     const sockaddr *constAddress() const;
     

@@ -59,12 +59,15 @@ int UdpSocket::receiveFrom(OutputMemoryStream &stream, sockaddr *remote)
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
 	char *buffer = reinterpret_cast<char *>(std::malloc(512));
 	int bytesReceived = recvfrom(m_sock, buffer, 512, 0, remote, &remoteHostSize);
-	if (bytesReceived < 0)
+	if (bytesReceived <= 0)
 	{
 		m_inError = true;
 		m_errorMsg = "Could not receive data";
 	}
-	stream.write(buffer, bytesReceived);
+    else
+    {
+        stream.write(buffer, bytesReceived);
+    }
 	std::free(buffer);
 	return bytesReceived;
 }
@@ -79,7 +82,7 @@ int UdpSocket::receiveFrom(OutputMemoryStream &stream)
 	sock_addr_size remoteHostSize = sizeof(sockaddr);
 	char *buffer = reinterpret_cast<char *>(std::malloc(512));
 	int bytesReceived = recvfrom(m_sock, buffer, 512, 0, &remoteHost, &remoteHostSize);
-	if (bytesReceived < 0)
+	if (bytesReceived <= 0)
 	{
 		m_inError = true;
 		m_errorMsg = "Could not receive data";

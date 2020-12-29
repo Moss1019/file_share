@@ -6,6 +6,10 @@
 #include <arpa/inet.h>
 #endif
 
+#include <string>
+
+#include "AddressEvent.h"
+#include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
 #include <iostream>
@@ -13,6 +17,7 @@
 AddressServer::AddressServer(const SockAddress &host)
 {
     m_socket = new UdpSocket(host);
+    m_isRunning = true;
 }
 
 AddressServer::~AddressServer()
@@ -20,16 +25,65 @@ AddressServer::~AddressServer()
     stop();
 }
 
+void AddressServer::run()
+{
+    while(m_isRunning)
+    {
+        OutputMemoryStream stream;
+        sockaddr remoteAddr;
+        int bytesReceived = m_socket->receiveFrom(stream, &remoteAddr);
+        std::cout << "Received " << bytesReceived;
+        if(bytesReceived <= 0)
+        {
+            continue;
+        }
+        SockAddress remote(remoteAddr);
+        InputMemoryStream inStream(stream.getBufferPtr(), stream.getLength());
+        AddressEvent addrEvent;
+        addrEvent.read(inStream);
+        switch(addrEvent.type())
+        {
+            case AddressEventType::CONNECTED:
+            {
+                char *buffer = reinterpret_cast<char *>(std::malloc(addrEvent.dataSize()));
+                std::memcpy(buffer, addrEvent.data(), addrEvent.dataSize());
+                std::string identifier(buffer);
+                std::free(buffer);
+                m_addresses[identifier] = SockAddress(remote);
+                
+                std::cout << "Connected " << identifier << std::endl;
+                
+                break;
+            }
+            case AddressEventType::DISCONNECTED:
+            {
+                char *buffer = reinterpret_cast<char *>(std::malloc(addrEvent.dataSize()));
+                std::memcpy(buffer, addrEvent.data(), addrEvent.dataSize());
+                std::string identifier(buffer);
+                std::free(buffer);
+                auto addrIter = m_addresses.find(identifier);
+                if(addrIter != m_addresses.end())
+                {
+                    m_addresses.erase(addrIter);
+                }
+                
+                std::cout << "Disconnected " << identifier << std::endl;
+                
+                break;
+            }
+            default:
+            {
+                std::cout << "Strange" << std::endl;
+                m_isRunning = false;
+                break;
+            }
+        }
+    }
+}
+
 void AddressServer::start()
 {
-    std::cout << "Waiting " << std::endl;
-    
-    OutputMemoryStream stream;
-    sockaddr remoteAddr;
-    m_socket->receiveFrom(stream, &remoteAddr);
-    SockAddress remote(remoteAddr);
-    
-    std::cout << "Connected " << remote.ipAddress() << std::endl;
+    m_runThread = new std::thread(&AddressServer::run, this);
 }
 
 void AddressServer::stop()
@@ -39,5 +93,11 @@ void AddressServer::stop()
     {
         delete m_socket;
         m_socket = nullptr;
+    }
+    if(m_runThread != nullptr)
+    {
+        m_runThread->join();
+        delete m_runThread;
+        m_runThread = nullptr;
     }
 }

@@ -137,6 +137,9 @@ int main(int argc, const char * argv[])
     AddressServer server(host);
     server.start();
     
+    int x;
+    std::cin >> x;
+    
     server.stop();
     
 #endif

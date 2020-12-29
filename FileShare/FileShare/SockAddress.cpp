@@ -24,6 +24,11 @@ SockAddress::SockAddress(const sockaddr &remote)
     memcpy(&m_addr, &remote, sizeof(sockaddr));
 }
 
+SockAddress::SockAddress(const SockAddress &other)
+{
+    memcpy(&m_addr, &other.m_addr, sizeof(sockaddr));
+}
+
 const sockaddr *SockAddress::constAddress() const
 {
     return &m_addr;
