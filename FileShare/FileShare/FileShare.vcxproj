@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddressEvent.cpp" />
     <ClCompile Include="AddressServer.cpp" />
     <ClCompile Include="InputMemoryStream.cpp" />
     <ClCompile Include="main.cpp" />
@@ -147,9 +148,10 @@
     <ClCompile Include="SockAddress.cpp" />
     <ClCompile Include="TcpServer.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
-    <ClCompile Include="UpdSocket.cpp" />
+    <ClCompile Include="UdpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddressEvent.h" />
     <ClInclude Include="AddressServer.h" />
     <ClInclude Include="InputMemoryStream.h" />
     <ClInclude Include="Message.h" />
@@ -158,7 +160,7 @@
     <ClInclude Include="TcpServer.h" />
     <ClInclude Include="TcpSocket.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="UpdSocket.h" />
+    <ClInclude Include="UdpSocket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

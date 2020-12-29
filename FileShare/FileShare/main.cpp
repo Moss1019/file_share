@@ -21,6 +21,7 @@
 #include "TcpServer.h"
 #include "TcpSocket.h"
 #include "SockAddress.h"
+#include "AddressEvent.h"
 #include "AddressServer.h"
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
@@ -105,9 +106,9 @@ int main(int argc, const char * argv[])
     std::string hostName = "windows";
     void *buffer = std::malloc(hostName.length());
     memcpy(buffer, hostName.c_str(), hostName.length());
-    Event connectEvent(EventType::CONNECTED, hostName.length(), buffer);
+    AddressEvent e(AddressEventType::CONNECTED, hostName.length(), buffer);
     OutputMemoryStream stream;
-    connectEvent.serialize(stream);
+    e.write(stream);
 
     SockAddress addressHost("192.168.1.176", 8081);
     updSock.sendTo(stream, addressHost);

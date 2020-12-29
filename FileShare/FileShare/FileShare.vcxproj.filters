@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UpdSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,11 +36,14 @@
     <ClCompile Include="AddressServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AddressEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UpdSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InputMemoryStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,6 +66,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AddressServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddressEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
