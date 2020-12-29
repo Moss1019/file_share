@@ -12,15 +12,21 @@ AddressEvent::AddressEvent(AddressEventType type)
 }
 
 AddressEvent::AddressEvent(AddressEventType type, unsigned dataSize, void *data)
-	:m_type(type), m_dataSize(dataSize), m_data(data)
+	:m_type(type), m_dataSize(dataSize)
 {
+	if (dataSize > 0)
+	{
+		m_data = std::malloc(m_dataSize);
+		std::memcpy(m_data, data, m_dataSize);
+	}
 }
 
 AddressEvent::~AddressEvent()
 {
-	if (m_dataSize > 0)
+	if (m_data != nullptr)
 	{
 		std::free(m_data);
+		m_data = nullptr;
 	}
 }
 

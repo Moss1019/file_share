@@ -21,7 +21,11 @@ InputMemoryStream::InputMemoryStream(const char *buffer, int byteCount)
 
 InputMemoryStream::~InputMemoryStream()
 {
-	std::free(m_buffer);
+	if (m_buffer != nullptr)
+	{
+		std::free(m_buffer);
+		m_buffer = nullptr;
+	}
 }
 
 unsigned InputMemoryStream::getRemainingSize() const
