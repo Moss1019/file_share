@@ -34,47 +34,36 @@ int main(int argc, const char * argv[])
 #endif
 
 #ifdef _WIN32
-    SockAddress host("192.168.1.100", 8081);
-    AddressServer server(host);
-    server.start();
     
-    int x;
-    std::cin >> x;
-    
-    server.stop();
-    
-
 #else
-    std::string ipAddress = "192.168.1.176";
-    SockAddress host(ipAddress, 8081);
-    std::cout << host.ipAddress() << std::endl;
+    SockAddress udpHost("192.168.1.176", 8081);
+    SockAddress tcpHost("192.168.1.176", 8080);
 
-    UdpSocket updSock(host);
-    SockAddress addressHost("192.168.1.100", 8081);
+    AddressServer server(udpHost);
+    server.start();
 
-    std::string hostName = "windows";
-    void *buffer = std::malloc(hostName.length());
-    memcpy(buffer, hostName.c_str(), hostName.length());
+    bool isRunning = true;
 
-    AddressEvent e1(AddressEventType::CONNECTED, hostName.length(), buffer);
-    OutputMemoryStream stream1;
-    e1.write(stream1);
+    while (isRunning)
+    {
+        int choice;
+        std::cout << "0. quit" << std::endl << "1. show clients" << " -> ";
+        std::cin >> choice;
+        switch (choice)
+        {
+        case 0:
+        {
+            isRunning = false;
+            break;
+        }
+        case 1:
+        {
+            std::cout << "Clients: " << std::endl;
+        }
+        }
+    }
 
-    updSock.sendTo(stream1, addressHost);
-
-    AddressEvent e2(AddressEventType::DISCONNECTED, hostName.length(), buffer);
-    OutputMemoryStream stream2;
-    e2.write(stream2);
-
-    updSock.sendTo(stream2, addressHost);
-
-    AddressEvent e3(AddressEventType::DEFAULT, hostName.length(), buffer);
-    OutputMemoryStream stream3;
-    e3.write(stream3);
-
-    updSock.sendTo(stream3, addressHost);
-
-    std::free(buffer);
+    server.stop();
 #endif
 
 #ifdef _WIN32
