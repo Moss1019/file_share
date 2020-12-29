@@ -40,3 +40,5 @@
 **/FileShare.xcodeproj
 
 **.test
+
+**/FileShare/files

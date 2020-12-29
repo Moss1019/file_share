@@ -17,14 +17,14 @@
 #include <cstring>
 #include <iostream>
 
-#include "Message.h"
-#include "UpdSocket.h"
+#include "UdpSocket.h"
+#include "TcpServer.h"
+#include "TcpSocket.h"
 #include "SockAddress.h"
+#include "AddressServer.h"
 #include "InputMemoryStream.h"
 #include "OutputMemoryStream.h"
 
-#include "TcpServer.h"
-#include "TcpSocket.h"
 
 enum class EventType
 {
@@ -113,21 +113,31 @@ int main(int argc, const char * argv[])
     updSock.sendTo(stream, addressHost);
 
 #else
-    SockAddress host("192.168.1.176", 8081); 
-    UdpSocket udpSock(host);
-    OutputMemoryStream outStream;
-    sockaddr remote;
-    udpSock.receiveFrom(outStream, &remote);
-    SockAddress remoteHost(remote);
-    std::cout << remoteHost.ipAddress() << std::endl;
-    InputMemoryStream inStream(outStream.getBufferPtr(), outStream.getLength());
-    Event event;
-    event.deserialize(inStream);
-    std::cout << event.dataSize << std::endl;
-    if(event.type == EventType::CONNECTED)
-    {
-        std::cout << std::string(reinterpret_cast<char *>(event.data)) << std::endl;
-    }
+//    SockAddress host("192.168.1.176", 8081);
+//    UdpSocket udpSock(host);
+//
+//    OutputMemoryStream outStream;
+//    sockaddr remote;
+//    udpSock.receiveFrom(outStream, &remote);
+//    SockAddress remoteHost(remote);
+//    std::cout << remoteHost.ipAddress() << std::endl;
+//
+//
+//
+//    InputMemoryStream inStream(outStream.getBufferPtr(), outStream.getLength());
+//    Event event;
+//    event.deserialize(inStream);
+//    std::cout << event.dataSize << std::endl;
+//    if(event.type == EventType::CONNECTED)
+//    {
+//        std::cout << std::string(reinterpret_cast<char *>(event.data)) << std::endl;
+//    }
+    SockAddress host("192.168.1.176", 8081);
+    AddressServer server(host);
+    server.start();
+    
+    server.stop();
+    
 #endif
 
 #ifdef _WIN32

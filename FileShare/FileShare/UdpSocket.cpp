@@ -1,4 +1,4 @@
-#include "UpdSocket.h"
+#include "UdpSocket.h"
 
 UdpSocket::UdpSocket(const SockAddress &address)
 	:m_inError(false), m_errorMsg("")
