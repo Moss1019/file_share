@@ -50,10 +50,11 @@ void AddressServer::run()
                 std::memcpy(buffer, addrEvent.data(), addrEvent.dataSize());
                 std::string identifier(buffer);
                 std::free(buffer);
-                m_addresses[identifier] = SockAddress(remote);
-                
-                std::cout << "Connected " << identifier << std::endl;
-                
+                auto addrItr = m_addresses.find(identifier);
+                if(addrItr == m_addresses.end())
+                {
+                    m_addresses[identifier] = SockAddress(remote);
+                }
                 break;
             }
             case AddressEventType::DISCONNECTED:
@@ -67,9 +68,29 @@ void AddressServer::run()
                 {
                     m_addresses.erase(addrIter);
                 }
-                
-                std::cout << "Disconnected " << identifier << std::endl;
-                
+                break;
+            }
+            case AddressEventType::FETCH_ALL:
+            {
+                OutputMemoryStream stream;
+                stream.write(static_cast<unsigned>(m_addresses.size()));
+                void *identifierBuffer = std::malloc(32);
+                void *addressBuffer = std::malloc(16);
+                for(auto itr = m_addresses.begin(); itr != m_addresses.end(); ++itr)
+                {
+                    stream.write(static_cast<unsigned>(itr->first.length()));
+                    std::memcpy(identifierBuffer, itr->first.c_str(), itr->first.length());
+                    stream.write(identifierBuffer, itr->first.length());
+                    stream.write(static_cast<unsigned>(itr->second.ipAddress().length()));
+                    std::memcpy(addressBuffer, itr->second.ipAddress().c_str(), itr->second.ipAddress().length());
+                    stream.write(addressBuffer, itr->second.ipAddress().length());
+                }
+                std::free(identifierBuffer);
+                std::free(addressBuffer);
+                for(auto itr = m_addresses.begin(); itr != m_addresses.end(); ++itr)
+                {
+                    m_socket->sendTo(stream, itr->second);
+                }
                 break;
             }
             default:
