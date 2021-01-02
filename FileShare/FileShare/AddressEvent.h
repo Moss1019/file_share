@@ -7,7 +7,8 @@ enum class AddressEventType
 {
 	DEFAULT,
 	CONNECTED,
-	DISCONNECTED
+	DISCONNECTED,
+    FETCH_ALL
 };
 
 class AddressEvent

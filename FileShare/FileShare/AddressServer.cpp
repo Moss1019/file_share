@@ -29,11 +29,9 @@ void AddressServer::run()
 {
     while(m_isRunning)
     {
-        std::cout << "Wainting\n";
         OutputMemoryStream stream;
         sockaddr remoteAddr;
         int bytesReceived = m_socket->receiveFrom(stream, &remoteAddr);
-        std::cout << "Received " << bytesReceived;
         if(bytesReceived <= 0)
         {
             continue;
