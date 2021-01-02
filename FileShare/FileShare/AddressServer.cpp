@@ -121,3 +121,11 @@ void AddressServer::stop()
         m_runThread = nullptr;
     }
 }
+
+void AddressServer::printClients(std::ostream &out) const
+{
+    for (auto itr = m_addresses.begin(); itr != m_addresses.end(); ++itr)
+    {
+        out << itr->first << std::endl;
+    }
+}

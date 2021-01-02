@@ -2,6 +2,7 @@
 
 #include <map>
 #include <thread>
+#include <ostream>
 
 #include "UdpSocket.h"
 #include "SockAddress.h"
@@ -23,9 +24,11 @@ public:
     AddressServer(const SockAddress &host);
     
     ~AddressServer();
-    
+
     void start();
     
     void stop();
+
+    void printClients(std::ostream &out) const;
 };
 
